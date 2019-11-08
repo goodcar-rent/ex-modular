@@ -5,17 +5,17 @@
   "homepage": "https://github.com/goodcar-rent/ex-modular",
   "main": "src/app.js",
   "scripts": {
+    "start": "cross-env DEBUG='ex-modular:*' babel-node src/app.js",
     "clean": "rimraf lib",
     "test": "npm run lint && npm run cover",
     "test:prod": "cross-env BABEL_ENV=production npm run test",
     "test:only": "mocha ./test/**/*.js",
     "test:watch": "npm test -- --watch",
     "cover": "nyc npm run test:only",
-    "lint": "eslint src test",
+    "lint": "eslint",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib"
   },
   "files": [
-    "lib",
     "src"
   ],
   "publishConfig": {
@@ -40,6 +40,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "morgan": "^1.9.1",
+    "debug": "^4.1.1",
+    "cors": "^2.8.5",
+    "dotenv-safe": "^8.1.0",
     "cookie-parser": "^1.4.4"
   },
   "devDependencies": {
@@ -47,6 +50,7 @@
 		"@commitlint/config-conventional": "^8.2.0",
 		"husky": "^3.0.9",
     "@babel/cli": "^7.7.0",
+    "@babel/node": "^7.7.0",
     "@babel/core": "^7.7.2",
     "@babel/polyfill": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
@@ -54,6 +58,7 @@
     "babel-eslint": "^10.0.3",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-preset-minify": "^0.5.1",
+    "standard": "^14.3.1",
     "chai": "^4.2.0",
     "cross-env": "^6.0.3",
     "dirty-chai": "^2.0.1",
