@@ -2,8 +2,12 @@ import logger from 'morgan'
 import path from 'path'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import Express from 'express'
 
 export const appBuilder = (express, options) => {
+  if (!express) {
+    express = Express
+  }
   const app = express()
 
   // make default config

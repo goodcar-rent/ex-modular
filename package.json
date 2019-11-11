@@ -7,10 +7,7 @@
   "scripts": {
     "start": "cross-env DEBUG='ex-modular:*' babel-node src/app.js",
     "clean": "rimraf lib",
-    "test": "npm run lint && npm run cover",
-    "test:prod": "cross-env BABEL_ENV=production npm run test",
-    "test:only": "mocha ./test/**/*.js",
-    "test:watch": "npm test -- --watch",
+    "test": "mocha ./test/**/*.js",
     "cover": "nyc npm run test:only",
     "lint": "eslint",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib"
@@ -25,16 +22,16 @@
     "Express",
     "exModular"
   ],
-	"commitlint": {
-		"extends": [
-			"@commitlint/config-conventional"
-		]
-	},
-	"husky": {
-		"hooks": {
-			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-		}
-	},
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "author": "deksden",
   "license": "MIT",
   "dependencies": {
@@ -42,23 +39,24 @@
     "morgan": "^1.9.1",
     "debug": "^4.1.1",
     "cors": "^2.8.5",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "knex": "^0.20.1",
     "dotenv-safe": "^8.1.0",
     "cookie-parser": "^1.4.4"
   },
   "devDependencies": {
-		"@commitlint/cli": "^8.2.0",
-		"@commitlint/config-conventional": "^8.2.0",
-		"husky": "^3.0.9",
     "@babel/cli": "^7.7.0",
-    "@babel/node": "^7.7.0",
     "@babel/core": "^7.7.2",
+    "@babel/node": "^7.7.0",
     "@babel/polyfill": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
     "@babel/register": "^7.7.0",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "babel-eslint": "^10.0.3",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-preset-minify": "^0.5.1",
-    "standard": "^14.3.1",
     "chai": "^4.2.0",
     "cross-env": "^6.0.3",
     "dirty-chai": "^2.0.1",
@@ -70,8 +68,11 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-standard": "^4.0.1",
+    "husky": "^3.0.9",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
-    "rimraf": "^3.0.0"
+    "rimraf": "^3.0.0",
+    "standard": "^14.3.1",
+    "supertest": "^4.0.2"
   }
 }
