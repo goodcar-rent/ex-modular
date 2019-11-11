@@ -8,7 +8,7 @@
     "start": "cross-env DEBUG='ex-modular:*' babel-node src/app.js",
     "clean": "rimraf lib",
     "test": "mocha ./test/**/*.js",
-    "cover": "nyc npm run test:only",
+    "cover": "nyc npm run test",
     "lint": "eslint",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib"
   },
