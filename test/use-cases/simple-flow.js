@@ -3,19 +3,33 @@ import { describe, it, before } from 'mocha'
 import supertest from 'supertest'
 import chai, { expect } from 'chai'
 import dirtyChai from 'dirty-chai'
-// import _ from 'lodash'
+import env from 'dotenv-safe'
+
 import App from '../../src/packages/app-builder'
 
-/*
 import {
-  createAdminUser,
   loginAs,
   UserAdmin,
-  UserFirst,
-  userList, userCreate, userDelete, userSave
-} from './client/client-api'
+  // UserFirst,
+  // userList,
+  signupUser
+  // userDelete,
+  // userSave
+} from '../client/client-api'
+
+/**
+
+ Simple flow: простой use case:
+
+ Регистрируем первый пользовательский аккаунт
+ Он становится административным аккаунтом
+
+ Регистрируем второй и третий аккаунты. Они - обычные пользователи.
+
+ Администратору доступен список пользователей. Простым пользователем - нет.
+
+ Всем доступен собственный профиль.
 */
-import env from 'dotenv-safe'
 
 chai.use(dirtyChai)
 
@@ -38,7 +52,6 @@ describe('ex-modular tests', function () {
       .then((a) => {
         app = a
         context.request = supertest(app)
-        console.log('app builded')
         done()
       })
       .catch((err) => {
@@ -76,9 +89,25 @@ describe('ex-modular tests', function () {
   */
 
   describe('First use-case:', function () {
-    it('should be ok', function (done) {
-      expect(true).to.have.valueOf(true)
-      done()
+    it('Register first user account', function (done) {
+      signupUser(context, UserAdmin)
+        .then((res) => {
+          expect(res.body).to.exist('Body should exist')
+          expect(res.body).to.be.an('object')
+          expect(res.body.email).to.exist()
+          expect(res.body.email).to.be.equal(UserAdmin.email)
+          return loginAs(context, UserAdmin)
+        })
+        .then((res) => {
+          expect(res.body).to.exist('res.body should exist')
+          expect(res.body.token).to.exist('res.body.token should exist')
+
+          context.adminToken = res.body.token
+        })
+        .then(() => done())
+        .catch((err) => {
+          done(err)
+        })
     })
   })
 })

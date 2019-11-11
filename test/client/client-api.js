@@ -32,15 +32,8 @@ export const expected = {
   ErrCodeGeneric: 503
 }
 
-export const createAdminUser = context => context.request.post(`${context.apiRoot}/auth/signup`)
-  .send(UserAdmin)
-  .type('json')
-  .accept('json')
-  .accept('text')
-  .expect(expected.Ok)
-
-export const createUser = (context, user, expectedCode) => context.request.post(`${context.apiRoot}/auth/signup`)
-  .send(user || UserFirst)
+export const signupUser = (context, user, expectedCode) => context.request.post(`${context.apiRoot}/auth/signup`)
+  .send(user || UserAdmin)
   .type('json')
   .accept('json')
   .expect(expectedCode || expected.Ok)
