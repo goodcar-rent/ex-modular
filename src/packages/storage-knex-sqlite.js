@@ -80,14 +80,14 @@ export default (app) => {
           app.storage.db = null
         })
     },
-    storageSchemaInit: knexStorage.storageSchemaInit,
-    storageSchemaClear: knexStorage.storageSchemaClear,
+    schemaInit: knexStorage.schemaInit,
+    schemaClear: knexStorage.schemaClear,
 
-    storageDataInit: knexStorage.storageDataInit,
-    storageDataClear: knexStorage.storageDataClear,
+    dataInit: knexStorage.dataInit,
+    dataClear: knexStorage.dataClear,
 
-    storageRefsInit: knexStorage.storageRefsInit,
-    storageRefsClear: knexStorage.storageRefsClear,
+    refsInit: knexStorage.refsInit,
+    refsClear: knexStorage.refsClear,
 
     findById: knexStorage.findById,
     findOne: knexStorage.findOne,

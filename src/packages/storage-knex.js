@@ -18,8 +18,7 @@ export const processBeforeSaveToStorage = (Model) => (item) => {
 
   // process all default props if they are not defined in item:
   Model.props.map((prop) => {
-    if ((prop.default || prop.default !== undefined || true) &&
-      (!item[prop.name] || item[prop.name] === null || item[prop.name] === undefined)) {
+    if (prop.default && (!item[prop.name] || item[prop.name] === null || item[prop.name] === undefined)) {
       if (typeof prop.default === 'function') {
         aItem[prop.name] = prop.default(aItem)
       } else {
@@ -135,7 +134,7 @@ export default (app) => {
       return Promise.resolve()
     },
 
-    storageSchemaInit: (Model) => (id) => {
+    schemaInit: (Model) => (id) => {
       // console.log(`${Model.name}.init`)
       if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageSchemaInit: some Model's properties are invalid:
@@ -171,7 +170,7 @@ export default (app) => {
         })
     },
 
-    storageSchemaClear: (Model) => () => {
+    schemaClear: (Model) => () => {
       if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageSchemaClear: some Model's properties are invalid:
           Model ${Model},
@@ -190,7 +189,7 @@ export default (app) => {
         })
     },
 
-    storageDataInit: (Model) => (seedFileName) => {
+    dataInit: (Model) => (seedFileName) => {
       if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageDataInit: some Model's properties are invalid:
           Model ${Model},
@@ -206,7 +205,7 @@ export default (app) => {
         .catch((err) => { throw err })
     },
 
-    storageDataClear: (Model) => () => {
+    dataClear: (Model) => () => {
       if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageDataClear: some Model's properties are invalid:
           Model ${Model},
@@ -219,8 +218,8 @@ export default (app) => {
         .catch((err) => { throw err })
     },
 
-    storageRefsInit: (Model) => () => {},
-    storageRefsClear: (Model) => () => {},
+    refsInit: (Model) => () => {},
+    refsClear: (Model) => () => {},
 
     findById: (Model) => (id) => {
       if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
