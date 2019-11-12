@@ -3,12 +3,57 @@ import path from 'path'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import Express from 'express'
+import _ from 'lodash'
+
+import sqliteStorage from './storage-knex-sqlite'
+
+const exModular = (app) => {
+  const ex = {}
+  ex.modules = []
+  ex.storages = []
+
+  const addStorage = (storage) => {
+    ex.storages.push(storage)
+  }
+
+  const checkDeps = () => {
+    ex.modules.map((item) => {
+      if (!item.dependency) {
+        throw new Error(`invalid module deps format: no .dependency property for ${item.toString()}`)
+      }
+
+      if (!item.moduleName) {
+        throw new Error(`Module shoud have .moduleName in ${item.toString()}`)
+      }
+
+      if (!Array.isArray(item.dependency)) {
+        item.dependency = [item.dependency]
+      }
+
+      item.dependency.map((dep) => {
+        if (!_.has(ex, dep)) {
+          throw new Error(`Module deps check error: ${item.moduleName} dep "${dep}" not found`)
+        }
+      })
+    })
+  }
+
+  ex.addStorage = addStorage
+  ex.checkDeps = checkDeps
+
+  return ex
+}
 
 export const appBuilder = (express, options) => {
   if (!express) {
     express = Express
   }
+
+  // build express app
   const app = express()
+
+  // enhance with exModular object
+  app.exModular = exModular(app)
 
   // make default config
   options = options || {}
@@ -28,7 +73,7 @@ export const appBuilder = (express, options) => {
   // return promise that builds app:
   return Promise.resolve()
     .then(() => {
-      app.express = express
+      app.exModular.express = express
 
       // configure view engine / static engine:
       app.set('views', options.viewPath)
@@ -48,12 +93,15 @@ export const appBuilder = (express, options) => {
       // app.errors = Errors(app)
       // app.wrap = Wrap(app)
       // app.mail = Mail(app)
-      //
+
       // // init storage:
-      // app.storage = knexStorage(app)
-      // app.validator = Validator(app)
+      app.exModular.addStorage(sqliteStorage(app))
+      // app.exModular.services.validator = Validator(app)
       // app.controller = Controller(app)
       // app.controller.CrudActions = CrudActions(app)
+      //
+      // check dependings among installed modules (plugins):
+      app.exModular.checkDeps()
       //
       // // init models:
       // app.models = {}
