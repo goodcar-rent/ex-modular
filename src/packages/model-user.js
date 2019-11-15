@@ -52,7 +52,7 @@ export const User = (app) => {
         type: 'boolean',
         default: false
       }
-    ],
+    ]
   }
   return Model
 }
