@@ -1,6 +1,6 @@
-const packageName = 'Crud-actions package'
+const packageName = 'route-builder package'
 
-export const actionList = (app, Model) => {
+const routeList = (app, Model) => {
   return {
     method: 'GET',
     name: `/${Model.name}.list`,
@@ -12,7 +12,7 @@ export const actionList = (app, Model) => {
   }
 }
 
-export const actionCreate = (app, Model) => {
+const routeCreate = (app, Model) => {
   return {
     method: 'POST',
     name: `/${Model.name}.create`,
@@ -27,11 +27,11 @@ export const actionCreate = (app, Model) => {
   }
 }
 
-export const actionRemoveAll = (app, Model) => {
+const routeRemoveAll = (app, Model) => {
   return {
     method: 'DELETE',
     name: `/${Model.name}.removeAll`,
-    description: `Delete all "${Model.name}"`,
+    description: `Delete all items from "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}`,
     handler: app.controller.removeAll(Model),
     type: 'Model',
@@ -39,11 +39,11 @@ export const actionRemoveAll = (app, Model) => {
   }
 }
 
-export const actionItem = (app, Model) => {
+const routeItem = (app, Model) => {
   return {
     method: 'GET',
     name: `/${Model.name}.item`,
-    description: `Get single "${Model.name}" by id`,
+    description: `Get single item of "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.controller.item(Model),
     validate: {
@@ -54,11 +54,11 @@ export const actionItem = (app, Model) => {
   }
 }
 
-export const actionSave = (app, Model) => {
+const routeSave = (app, Model) => {
   return {
     method: 'PUT',
     name: `/${Model.name}.item`,
-    description: `Save (update) "${Model.name}"`,
+    description: `Save (update) single item in "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.controller.save(Model),
     validate: {
@@ -70,11 +70,11 @@ export const actionSave = (app, Model) => {
   }
 }
 
-export const actionRemove = (app, Model) => {
+const routeRemove = (app, Model) => {
   return {
     method: 'DELETE',
     name: `/${Model.name}.item`,
-    description: `Delete single "${Model.name}" by id`,
+    description: `Delete single item in "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.controller.remove(Model),
     validate: {
@@ -85,7 +85,7 @@ export const actionRemove = (app, Model) => {
   }
 }
 
-export const crudRouteBuilder = (app) => {
+export const routeBuilderForModel = (app, Model) => {
   if (!app) {
     throw Error(`${packageName}: expect app to be initialized`)
   }
@@ -107,12 +107,12 @@ export const crudRouteBuilder = (app) => {
 
   const actions = (Model) => {
     return [
-      actionList(app, Model),
-      actionCreate(app, Model),
-      actionRemoveAll(app, Model),
-      actionItem(app, Model),
-      actionSave(app, Model),
-      actionRemove(app, Model)
+      routeList(app, Model),
+      routeCreate(app, Model),
+      routeRemoveAll(app, Model),
+      routeItem(app, Model),
+      routeSave(app, Model),
+      routeRemove(app, Model)
     ]
   }
   return actions

@@ -6,6 +6,9 @@ import Express from 'express'
 
 import sqliteStorage from './storage-knex-sqlite'
 import { exModular } from './ex-modular'
+import { User } from './model-user'
+import { Wrap } from './service-wrap'
+import { Mailer } from './service-mailer'
 
 export const appBuilder = (express, options) => {
   if (!express) {
@@ -55,8 +58,8 @@ export const appBuilder = (express, options) => {
 
       // init services
       // app.errors = Errors(app)
-      // app.wrap = Wrap(app)
-      // app.mail = Mail(app)
+      app.exModular.services.wrap = Wrap(app)
+      app.exModular.services.mailer = Mailer(app)
 
       // // init storage:
       app.exModular.storagesAdd(sqliteStorage(app))
@@ -69,7 +72,7 @@ export const appBuilder = (express, options) => {
       //
       // // init models:
       // app.models = {}
-      app.exModular.addModel(User(app))
+      app.exModular.modelAdd(User(app))
       //
       // app.routeBuilder = RouteBuilder(app)
       // app.routeBuilder.routerForAllModels()
@@ -94,7 +97,8 @@ export const appBuilder = (express, options) => {
       // })
       return app
     })
-    .then((app) => app.exModular.storagesInit())
+    .then((app) => app.exModular.storagesInit()) // init storages:
+    .then(() => app.exModular.modelsInit())
     .then(() => app)
     .catch((err) => { throw err })
 }

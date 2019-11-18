@@ -7,10 +7,14 @@ export const exModular = (app) => {
   ex.models = []
   ex.schemas = []
   ex.services = {}
+  ex.storages.default = null
 
   const storagesAdd = (storage) => {
     // check storage signature
     ex.storages.push(storage)
+    if (ex.storages.length === 1) {
+      ex.storages.default = storage
+    }
   }
 
   const storagesInit = () => {
@@ -42,9 +46,28 @@ export const exModular = (app) => {
     })
   }
 
+  // init models
+  const modelsInit = () => {
+    if (!ex.storages || !ex.models) {
+      throw new Error('.storages should be initialized before initializing model')
+    }
+    return Promise.all(ex.models.map((model) => {
+      if (model.storage === 'default') {
+        model.storage = ex.storages.default
+      }
+      model.
+      model.storageInit()
+    }))
+  }
+  const modelAdd = (model) => {
+    ex.models[model.name] = model
+  }
+
   ex.storagesAdd = storagesAdd
   ex.checkDeps = checkDeps
   ex.storagesInit = storagesInit
+  ex.modelAdd = modelAdd
+  ex.modelsInit = modelsInit
 
   return ex
 }

@@ -1,7 +1,12 @@
 import uuid from 'uuid/v4'
 import bcrypt from 'bcrypt'
 
-export const User = (app) => {
+export const User = (app, options) => {
+  if (!options) {
+    options = {}
+  }
+  options.storage = options.storage || 'default'
+
   const Model = {
     name: 'User',
     priority: 0,
