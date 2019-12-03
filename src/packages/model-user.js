@@ -7,7 +7,7 @@ export const User = (app, options) => {
   }
   options.storage = options.storage || 'default'
 
-  const Model = {
+  const Schema = {
     name: 'User',
     priority: 0,
     props: [
@@ -57,7 +57,8 @@ export const User = (app, options) => {
         type: 'boolean',
         default: false
       }
-    ]
+    ],
+    isPassword: (encodedPassword, password) => bcrypt.compareSync(password, encodedPassword)
   }
-  return Model
+  return Schema
 }

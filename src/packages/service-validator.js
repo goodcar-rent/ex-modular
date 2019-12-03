@@ -1,7 +1,7 @@
 import { body, param, validationResult, matchedData } from 'express-validator'
 
 const packageName = 'Service.Validator'
-export default (app) => {
+export const Validator = (app) => {
   app.exModular.modulesAdd({ moduleName: packageName, dependency: ['services.errors', 'services.errors.ServerInvalidParams']})
 
   const Validator = {

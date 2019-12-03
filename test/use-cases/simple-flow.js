@@ -60,9 +60,9 @@ describe('ex-modular tests', function () {
   })
 
   after((done) => {
-    // app.storage.closeStorage()
-    //   .then(() => done())
-    //   .catch(done)
+    app.exModular.storagesClose()
+      .then(() => done())
+      .catch(done)
   })
   /*
     beforeEach(function (done) {

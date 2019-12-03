@@ -2,19 +2,27 @@ import _ from 'lodash'
 
 export const exModular = (app) => {
   const ex = {}
+  ex.app = app
   ex.modules = []
   ex.storages = []
-  ex.models = []
+  ex.models = {}
   ex.schemas = []
   ex.services = {}
   ex.storages.default = null
 
-  const modulesAdd = (module) => {
+  ex.storages.byName = (name) => {
+    if (name === 'default') {
+      return ex.storages.default
+    }
+    return _.find(ex.storages, { name })
+  }
+
+  ex.modulesAdd = (module) => {
     // check storage signature
     ex.modules.push(module)
   }
 
-  const storagesAdd = (storage) => {
+  ex.storagesAdd = (storage) => {
     // check storage signature
     ex.storages.push(storage)
     if (ex.storages.length === 1) {
@@ -22,14 +30,22 @@ export const exModular = (app) => {
     }
   }
 
-  const storagesInit = () => {
+  ex.storagesInit = () => {
     if (!ex.storages || ex.storages.length < 1) {
       throw new Error('.storages should be initialized')
     }
     return Promise.all(ex.storages.map((storage) => storage.storageInit()))
   }
 
-  const checkDeps = () => {
+  ex.storagesClose = () => {
+    if (!ex.storages || ex.storages.length < 1) {
+      throw new Error('.storages should be initialized')
+    }
+    return Promise.all(ex.storages.map((storage) => storage.storageClose()))
+      .catch(e => { throw e })
+  }
+
+  ex.checkDeps = () => {
     ex.modules.map((item) => {
       if (!item.dependency) {
         throw new Error(`invalid module deps format: no .dependency property for ${item.toString()}`)
@@ -52,31 +68,29 @@ export const exModular = (app) => {
   }
 
   // init models
-  const modelsInit = () => {
+  ex.modelsInit = () => {
     if (!ex.storages || !ex.models) {
       throw new Error('.storages should be initialized before initializing model')
     }
-    return Promise.all(ex.models.map((model) => {
+    return Promise.all(Object.keys(ex.models).map((modelName) => {
+      const model = ex.models[modelName]
       if (model.storage === 'default') {
         model.storage = ex.storages.default
       }
       // model.
-      model.storageInit()
+      return model.schemaInit()
     }))
   }
-  const modelAdd = (model) => {
-    if (!model.storage) {
-      model.storage = 'default'
+  ex.modelAdd = (model) => {
+    if (!model || !model.name || !model.props) {
+      throw new Error(`exModular.modelAdd: invalid model "${model}"`)
     }
-    ex.models[model.name] = model
-  }
+    if (!model.storage) {
+      model.storage = ex.storages.default
+    }
 
-  ex.modulesAdd = modulesAdd
-  ex.storagesAdd = storagesAdd
-  ex.checkDeps = checkDeps
-  ex.storagesInit = storagesInit
-  ex.modelAdd = modelAdd
-  ex.modelsInit = modelsInit
+    ex.models[model.name] = model.storage.modelFromSchema(model)
+  }
 
   return ex
 }

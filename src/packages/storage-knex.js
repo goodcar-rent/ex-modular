@@ -122,6 +122,27 @@ export default (app) => {
     processBeforeSaveToStorage: processBeforeSaveToStorage,
     processAfterLoadFromStorage: processAfterLoadFromStorage,
 
+    modelFromSchema: (Model) => {
+      return _.assign({}, Model, {
+        processBeforeSaveToStorage: Model.storage.processBeforeSaveToStorage(Model),
+        processAfterLoadFromStorage: Model.storage.processAfterLoadFromStorage(Model),
+        dataInit: Model.storage.dataInit(Model),
+        dataClear: Model.storage.dataClear(Model),
+        schemaInit: Model.storage.schemaInit(Model),
+        schemaClear: Model.storage.schemaClear(Model),
+        refsInit: Model.storage.refsInit(Model),
+        refsClear: Model.storage.refsClear(Model),
+        findById: Model.storage.findById(Model),
+        findOne: Model.storage.findOne(Model),
+        findAll: Model.storage.findAll(Model),
+        count: Model.storage.count(Model),
+        removeById: Model.storage.removeById(Model),
+        removeAll: Model.storage.removeAll(Model),
+        create: Model.storage.create(Model),
+        update: Model.storage.update(Model)
+      })
+    },
+
     mapPropToKnexTable: (prop, table) => {
       return table.string(prop.name)
     },
@@ -136,14 +157,13 @@ export default (app) => {
 
     schemaInit: (Model) => (id) => {
       // console.log(`${Model.name}.init`)
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageSchemaInit: some Model's properties are invalid:
           Model ${Model},
-          .app ${Model.app}
-          .storage${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage${Model.storage}
+          .db ${Model.storage.db}`))
       }
-      const knex = app.storage.db
+      const knex = Model.storage.db
 
       return knex.schema.hasTable(Model.name)
         .then((exists) => {
@@ -171,12 +191,12 @@ export default (app) => {
     },
 
     schemaClear: (Model) => () => {
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageSchemaClear: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
 
@@ -190,12 +210,12 @@ export default (app) => {
     },
 
     dataInit: (Model) => (seedFileName) => {
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageDataInit: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
       const seedData = JSON.parse(fs.readFileSync(seedFileName))
@@ -206,12 +226,12 @@ export default (app) => {
     },
 
     dataClear: (Model) => () => {
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.storageDataClear: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
       return knex(Model.name).del()
@@ -222,12 +242,12 @@ export default (app) => {
     refsClear: (Model) => () => {},
 
     findById: (Model) => (id) => {
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.findById: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
 
@@ -239,12 +259,12 @@ export default (app) => {
     },
 
     findOne: (Model) => (opt) => {
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.findOne: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
 
@@ -259,12 +279,12 @@ export default (app) => {
     findAll: (Model) => (opt) => {
       // console.log('storage.findAll:')
       // console.log(opt)
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.findAll: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
 
@@ -287,12 +307,12 @@ export default (app) => {
 
     count: (Model) => () => {
       // console.log('storage.count')
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.count: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
       return knex(Model.name)
@@ -315,12 +335,12 @@ export default (app) => {
     },
 
     removeById: (Model) => (id) => {
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.removeById: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
       return Model.findById(id)
@@ -358,12 +378,12 @@ export default (app) => {
     },
 
     create: (Model) => (item) => {
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.create: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
       const aItem = Model.processBeforeSaveToStorage(item)
@@ -382,12 +402,12 @@ export default (app) => {
       if (!item.id) {
         return Promise.reject(new Error(`${Model.name}.update: item.id should have proper value`))
       }
-      if (!Model || !Model.app || !Model.app.storage || !Model.app.storage.db) {
+      if (!Model || !Model.app || !Model.storage || !Model.storage.db) {
         return Promise.reject(new Error(`${Model.name}.update: some Model's properties are invalid:
           Model ${Model},
           .app ${Model.app}
-          .storage ${Model.app.storage}
-          .db ${Model.app.storage.db}`))
+          .storage ${Model.storage}
+          .db ${Model.storage.db}`))
       }
       const knex = app.storage.db
 

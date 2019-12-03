@@ -4,9 +4,14 @@ import Knex from 'knex'
 export default (app) => {
   const knexStorage = KnexStorage(app)
 
+  if (!app.env.KNEX_STORAGE_URL) {
+    throw new Error('storage-knex-sqlie expect to have env.KNEX_STORAGE_URL')
+  }
+
   const aStorage = {
     db: {},
     name: 'KNEX-SQLite',
+    modelFromSchema: knexStorage.modelFromSchema,
     processBeforeSaveToStorage: knexStorage.processBeforeSaveToStorage,
     processAfterLoadFromStorage: knexStorage.processAfterLoadFromStorage,
     mapPropToKnexTable: (prop, table) => {
@@ -74,10 +79,10 @@ export default (app) => {
     storageClose: () => {
       // console.log('KNEX - close')
       return Promise.resolve()
-        .then(() => app.storage.db.migrate.latest())
+        .then(() => aStorage.db.migrate.latest())
         .then(() => {
-          app.storage.db.destroy()
-          app.storage.db = null
+          aStorage.db.destroy()
+          aStorage.db = null
         })
     },
     schemaInit: knexStorage.schemaInit,
