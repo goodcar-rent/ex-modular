@@ -9,6 +9,11 @@ export const exModular = (app) => {
   ex.services = {}
   ex.storages.default = null
 
+  const modulesAdd = (module) => {
+    // check storage signature
+    ex.modules.push(module)
+  }
+
   const storagesAdd = (storage) => {
     // check storage signature
     ex.storages.push(storage)
@@ -31,7 +36,7 @@ export const exModular = (app) => {
       }
 
       if (!item.moduleName) {
-        throw new Error(`Module shoud have .moduleName in ${item.toString()}`)
+        throw new Error(`Module should have .moduleName in ${item.toString()}`)
       }
 
       if (!Array.isArray(item.dependency)) {
@@ -55,14 +60,18 @@ export const exModular = (app) => {
       if (model.storage === 'default') {
         model.storage = ex.storages.default
       }
-      model.
+      // model.
       model.storageInit()
     }))
   }
   const modelAdd = (model) => {
+    if (!model.storage) {
+      model.storage = 'default'
+    }
     ex.models[model.name] = model
   }
 
+  ex.modulesAdd = modulesAdd
   ex.storagesAdd = storagesAdd
   ex.checkDeps = checkDeps
   ex.storagesInit = storagesInit

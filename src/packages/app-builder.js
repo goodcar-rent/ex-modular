@@ -9,6 +9,7 @@ import { exModular } from './ex-modular'
 import { User } from './model-user'
 import { Wrap } from './service-wrap'
 import { Mailer } from './service-mailer'
+import { Errors } from './service-errors'
 
 export const appBuilder = (express, options) => {
   if (!express) {
@@ -60,6 +61,7 @@ export const appBuilder = (express, options) => {
       // app.errors = Errors(app)
       app.exModular.services.wrap = Wrap(app)
       app.exModular.services.mailer = Mailer(app)
+      app.exModular.services.errors = Errors(app)
 
       // // init storage:
       app.exModular.storagesAdd(sqliteStorage(app))
