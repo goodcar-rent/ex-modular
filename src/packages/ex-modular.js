@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { generateRoutesForModel } from './route-builder'
 
 export const exModular = (app) => {
   const ex = {}
@@ -6,7 +7,7 @@ export const exModular = (app) => {
   ex.modules = []
   ex.storages = []
   ex.models = {}
-  ex.schemas = []
+  ex.routes = []
   ex.services = {}
   ex.storages.default = null
 
@@ -89,8 +90,13 @@ export const exModular = (app) => {
       model.storage = ex.storages.default
     }
 
-    ex.models[model.name] = model.storage.modelFromSchema(model)
+    const aModel = model.storage.modelFromSchema(model)
+    aModel.routes = generateRoutesForModel(app, aModel)
+    ex.models[model.name] = aModel
   }
 
+  ex.routesAdd = (route) => {
+    ex.routes.push(route)
+  }
   return ex
 }

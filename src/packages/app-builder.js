@@ -6,11 +6,14 @@ import Express from 'express'
 
 import sqliteStorage from './storage-knex-sqlite'
 import { exModular } from './ex-modular'
-import { User } from './model-user'
 import { Wrap } from './service-wrap'
 import { Mailer } from './service-mailer'
 import { Errors } from './service-errors'
 import { Validator } from './service-validator'
+import { RouteBuilder } from './route-builder'
+import { Controller } from './service-controller'
+import { User } from './model-user'
+import { Session } from './model-session'
 
 export const appBuilder = (express, options) => {
   if (!express) {
@@ -64,19 +67,19 @@ export const appBuilder = (express, options) => {
       app.exModular.services.mailer = Mailer(app)
       app.exModular.services.errors = Errors(app)
       app.exModular.services.validator = Validator(app)
+      app.exModular.services.routeBuilder = RouteBuilder(app)
+      app.exModular.services.controller = Controller(app)
 
       // // init storage:
       app.exModular.storagesAdd(sqliteStorage(app))
-      // app.exModular.services.validator = Validator(app)
-      // app.controller = Controller(app)
-      // app.controller.CrudActions = CrudActions(app)
-      //
+
       // check dependings among installed modules (plugins):
       app.exModular.checkDeps()
       //
       // // init models:
       // app.models = {}
       app.exModular.modelAdd(User(app))
+      app.exModular.modelAdd(Session(app))
       //
       // app.routeBuilder = RouteBuilder(app)
       // app.routeBuilder.routerForAllModels()
