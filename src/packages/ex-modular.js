@@ -10,6 +10,11 @@ export const exModular = (app) => {
   ex.routes = []
   ex.services = {}
   ex.storages.default = null
+  ex.auth = {
+    systemGroups: {
+      loggedIn: ''
+    }
+  }
 
   ex.storages.byName = (name) => {
     if (name === 'default') {
@@ -78,25 +83,30 @@ export const exModular = (app) => {
       if (model.storage === 'default') {
         model.storage = ex.storages.default
       }
+      ex.routesAdd(generateRoutesForModel(app, model))
       // model.
       return model.schemaInit()
     }))
   }
   ex.modelAdd = (model) => {
     if (!model || !model.name || !model.props) {
-      throw new Error(`exModular.modelAdd: invalid model "${model}"`)
+      throw new Error(`exModular.modelAdd: invalid schema "${model}"`)
     }
     if (!model.storage) {
       model.storage = ex.storages.default
     }
-
     const aModel = model.storage.modelFromSchema(model)
-    aModel.routes = generateRoutesForModel(app, aModel)
     ex.models[model.name] = aModel
   }
 
-  ex.routesAdd = (route) => {
-    ex.routes.push(route)
+  ex.routesAdd = (routes) => {
+    // convert routes to array
+    if (!Array.isArray(routes)) {
+      routes = [routes]
+    }
+    routes.map((item) => {
+      ex.routes.push(item)
+    })
   }
   return ex
 }

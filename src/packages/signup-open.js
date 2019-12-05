@@ -16,7 +16,8 @@ export const SignupOpen = (app) => {
       'models.User',
       'models.User.isPassword',
       'models.Session',
-      'auth.getTokenFromSession'
+      'auth.getTokenFromSession',
+      'auth.registerLoggedUser'
     ]
   })
 
@@ -25,13 +26,16 @@ export const SignupOpen = (app) => {
     const User = app.exModular.models.User
     const Session = app.exModular.models.Session
 
+    let user = {}
+
     if (!req.data) {
       throw new Errors.ServerGenericError(
         `${packageName}.signup: Invalid request handling: req.data not initialized, use middleware to parse body`)
     }
 
     return User.create(req.data)
-      .then((user) => {
+      .then((aUser) => {
+        user = aUser
         if (!user) {
           return Promise.reject(new Errors.ServerInvalidUsernamePassword('Invalid username or password'))
         }
@@ -53,9 +57,7 @@ export const SignupOpen = (app) => {
       .then((session) => {
         res.json({ token: app.exModular.auth.getTokenFromSession(session.id) })
 
-        if (app.exModular.models.UserGroup) {
-          return app.exModular.models.UserGroup.addUser(app.exModular.models.UserGroup.systemGroupLoggedIn(), session.userId)
-        }
+        return app.exModular.auth.registerLoggedUser(user)
       })
       .catch((error) => {
         // console.log('login: error')
@@ -68,7 +70,8 @@ export const SignupOpen = (app) => {
       })
   }
 
-  const routes = [
+  // define routes for this module
+  app.exModular.routesAdd([
     {
       method: 'POST',
       name: 'Auth.Signup',
@@ -82,8 +85,7 @@ export const SignupOpen = (app) => {
       type: 'Auth',
       object: 'Signup'
     }
-  ]
+  ])
 
-  app.meta.actions = app.meta.actions.concat(actions)
   return app
 }
