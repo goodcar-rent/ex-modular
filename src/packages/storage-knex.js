@@ -123,7 +123,23 @@ export default (app) => {
     processAfterLoadFromStorage: processAfterLoadFromStorage,
 
     modelFromSchema: (Model) => {
-      return _.assign({}, Model, {
+      const aModel = {}
+      // process refs:
+      const refsProps = _.filter(Model.props, { type: 'refs' })
+      refsProps.map((prop) => {
+        const methodAdd = `${prop.name}Add`
+        const methodRemove = `${prop.name}Remove`
+        const methodClear = `${prop.name}Clear`
+        const methodCount = `${prop.name}Count`
+
+        // define methods:
+        aModel[methodAdd] = Model.storage.refAdd(Model, prop)
+        aModel[methodRemove] = Model.storage.refRemove(Model, prop)
+        aModel[methodClear] = Model.storage.refClear(Model, prop)
+        aModel[methodCount] = Model.storage.refCount(Model, prop)
+      })
+
+      return _.assign(aModel, Model, {
         processBeforeSaveToStorage: Model.storage.processBeforeSaveToStorage(Model),
         processAfterLoadFromStorage: Model.storage.processAfterLoadFromStorage(Model),
         dataInit: Model.storage.dataInit(Model),
@@ -444,6 +460,53 @@ export default (app) => {
         .where(Model.key, item.id)
         .update(aItem)
         .then(() => Model.findById(item.id))
+        .catch((err) => { throw err })
+    },
+
+    refAdd: (Model, prop) => (id, items) => {
+      return Model.findById(id)
+        .then((item) => {
+          if (!item) {
+            throw new Error(`${Model.name}.${prop.name}Add: item with id ${id} not found`)
+          }
+          item[prop.name] = _.union(item[prop.name], items)
+          return Model.update(item)
+        })
+        .catch((err) => { throw err })
+    },
+
+    refRemove: (Model, prop) => (id, items) => {
+      return Model.findById(id)
+        .then((item) => {
+          if (!item) {
+            throw new Error(`${Model.name}.${prop.name}Add: item with id ${id} not found`)
+          }
+          _.pullAll(item[prop.name], items)
+          return Model.update(item)
+        })
+        .catch((err) => { throw err })
+    },
+
+    refClear: (Model, prop) => (id) => {
+      return Model.findById(id)
+        .then((item) => {
+          if (!item) {
+            throw new Error(`${Model.name}.${prop.name}Add: item with id ${id} not found`)
+          }
+          item[prop.name] = []
+          return Model.update(item)
+        })
+        .catch((err) => { throw err })
+    },
+
+    refCount: (Model, prop) => (id) => {
+      return Model.findById(id)
+        .then((item) => {
+          if (!item) {
+            throw new Error(`${Model.name}.${prop.name}Add: item with id ${id} not found`)
+          }
+          return item[prop.name].length
+        })
         .catch((err) => { throw err })
     }
   }

@@ -1,33 +1,37 @@
-const packageName = 'Signup-open'
+import { accessLoggedIn, accessAdmin } from './access-system'
 
-export const SignupOpen = (app) => {
+const packageName = 'Access-simple'
+
+export const AccessSimple = (app) => {
   app.exModular.modulesAdd({
     moduleName: packageName,
     dependency: [
-      'services.errors',
-      'services.errors.ServerError',
-      'services.errors.ServerInvalidUsernamePassword',
-      'services.errors.ServerNotAllowed',
-      'services.errors.ServerGenericError',
-      'services.validator',
-      'services.validator.validatorFromModel',
-      'services.validator.paramId',
       'models',
-      'models.User',
-      'models.User.isPassword',
-      'models.Session',
-      'auth.getTokenFromSession'
+      'models.UserGroup',
+      'models.UserGroup.usersAdd'
     ]
   })
 
   const registerLoggedUser = (user) => {
-    if (app.exModular.models.UserGroup) {
-      return app.exModular.models.UserGroup.addUser(app.exModular.auth.systemGroups.loggedIn, user.Id)
-
+    if (!user || !user.id) {
+      throw Error(`${packageName}.registerLoggedUser: invalid param "user" - ${user.toString()}`)
     }
+
+    return app.exModular.models.UserGroup.usersAdd(accessLoggedIn, user.id)
+      .catch((e) => { throw e })
+  }
+
+  const addAdmin = (user) => {
+    if (!user || !user.id) {
+      throw Error(`${packageName}.addAdmin: invalid param "user" - ${user.toString()}`)
+    }
+
+    return app.exModular.models.UserGroup.usersAdd(accessAdmin, user.id)
+      .catch((e) => { throw e })
   }
 
   return {
-    registerLoggedUser
+    registerLoggedUser,
+    addAdmin
   }
 }

@@ -14,6 +14,9 @@ import { RouteBuilder } from './route-builder'
 import { Controller } from './service-controller'
 import { User } from './model-user'
 import { Session } from './model-session'
+import { AuthJwt as Auth } from './auth-jwt'
+import { AccessSimple as Access } from './access-simple'
+import { UserGroup } from './model-user-group'
 
 export const appBuilder = (express, options) => {
   if (!express) {
@@ -61,26 +64,27 @@ export const appBuilder = (express, options) => {
       // init cors:
       app.use(options.cors(options.corsOptions))
 
-      // init services
-      // app.errors = Errors(app)
+      // define services & other stuff:
       app.exModular.services.wrap = Wrap(app)
       app.exModular.services.mailer = Mailer(app)
       app.exModular.services.errors = Errors(app)
       app.exModular.services.validator = Validator(app)
       app.exModular.services.routeBuilder = RouteBuilder(app)
       app.exModular.services.controller = Controller(app)
+      app.exModular.auth = Auth(app)
+      app.exModular.access = Access(app)
 
-      // // init storage:
+      // define storage:
       app.exModular.storagesAdd(sqliteStorage(app))
+
+      // define models:
+      app.exModular.modelAdd(User(app))
+      app.exModular.modelAdd(UserGroup(app))
+      app.exModular.modelAdd(Session(app))
 
       // check dependings among installed modules (plugins):
       app.exModular.checkDeps()
-      //
-      // // init models:
-      // app.models = {}
-      app.exModular.modelAdd(User(app))
-      app.exModular.modelAdd(Session(app))
-      //
+
       // app.routeBuilder = RouteBuilder(app)
       // app.routeBuilder.routerForAllModels()
       //
@@ -104,7 +108,7 @@ export const appBuilder = (express, options) => {
       // })
       return app
     })
-    .then((app) => app.exModular.storagesInit()) // init storages:
+    .then((app) => app.exModular.storagesInit()) // init storages
     .then(() => app.exModular.modelsInit())
     .then(() => app)
     .catch((err) => { throw err })

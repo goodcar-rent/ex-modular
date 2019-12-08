@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken'
 
-const packageName = 'Session-jwt'
+const packageName = 'Auth-jwt'
 const DEF_SECRET = 'jhwckjeqfjnqwdoijed'
 
-export const SessionJWT = (app) => {
+export const AuthJwt = (app) => {
   app.exModular.modulesAdd({
     moduleName: packageName,
     dependency: [

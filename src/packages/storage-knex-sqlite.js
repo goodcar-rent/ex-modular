@@ -65,6 +65,13 @@ export default (app) => {
             connection: {
               filename: app.env.KNEX_STORAGE_URL
             },
+            migrations: {
+              tableName: 'knex_migrations',
+              directory: './data/migrations'
+            },
+            seeds: {
+              directory: './data/seeds'
+            },
             useNullAsDefault: true,
             debug
           }
@@ -101,7 +108,11 @@ export default (app) => {
     removeById: knexStorage.removeById,
     removeAll: knexStorage.removeAll,
     create: knexStorage.create,
-    update: knexStorage.update
+    update: knexStorage.update,
+    refAdd: knexStorage.refAdd,
+    refRemove: knexStorage.refRemove,
+    refClear: knexStorage.refClear,
+    refCount: knexStorage.refCount
   }
 
   return aStorage

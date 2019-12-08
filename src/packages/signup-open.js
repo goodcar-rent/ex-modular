@@ -6,62 +6,54 @@ export const SignupOpen = (app) => {
     dependency: [
       'services.errors',
       'services.errors.ServerError',
-      'services.errors.ServerInvalidUsernamePassword',
-      'services.errors.ServerNotAllowed',
       'services.errors.ServerGenericError',
       'services.validator',
       'services.validator.validatorFromModel',
       'services.validator.paramId',
       'models',
       'models.User',
-      'models.User.isPassword',
-      'models.Session',
-      'auth.getTokenFromSession',
-      'auth.registerLoggedUser'
+      'models.User.create',
+      'models.User.count',
+      'access.addAdmin'
     ]
   })
 
   const signup = (req, res) => {
     const Errors = app.exModular.services.errors
     const User = app.exModular.models.User
-    const Session = app.exModular.models.Session
-
-    let user = {}
 
     if (!req.data) {
       throw new Errors.ServerGenericError(
         `${packageName}.signup: Invalid request handling: req.data not initialized, use middleware to parse body`)
     }
 
-    return User.create(req.data)
+    /*
+
+    Generic signup code for "open" policy:
+    * everybody can signup
+    * first user will be admin automatically
+
+    */
+    let addUserAsAdmin = false
+    let user = null
+
+    return User.count()
+      .then((userCount) => {
+        if (userCount === 0) {
+          addUserAsAdmin = true
+        }
+        return User.create(req.data)
+      })
       .then((aUser) => {
         user = aUser
-        if (!user) {
-          return Promise.reject(new Errors.ServerInvalidUsernamePassword('Invalid username or password'))
+        if (addUserAsAdmin) {
+          return app.exModular.access.addAdmin(user)
         }
-
-        if (user.disabled) {
-          return Promise.reject(new Errors.ServerNotAllowed('User is disabled'))
-        }
-
-        // if (!user.emailVerified) {
-        //  throw new ServerNotAllowed('Email should be verified')
-        // }
-
-        if (!User.isPassword(user.password, req.body.password)) {
-          throw new Errors.ServerInvalidUsernamePassword('Invalid username or password') // password error
-        }
-
-        return Session.createOrUpdate({ userId: user.id, ip: req.ip })
       })
-      .then((session) => {
-        res.json({ token: app.exModular.auth.getTokenFromSession(session.id) })
-
-        return app.exModular.auth.registerLoggedUser(user)
+      .then(() => {
+        res.json(user)
       })
       .catch((error) => {
-        // console.log('login: error')
-        // console.log(error)
         if (error instanceof Errors.ServerError) {
           throw error
         } else {
@@ -82,6 +74,9 @@ export const SignupOpen = (app) => {
       validate: {
         body: app.validator.validatorFromModel(Model)
       }, */
+      /*
+      beforeHandler: [ app.exModular.auth.optional ],
+      */
       type: 'Auth',
       object: 'Signup'
     }

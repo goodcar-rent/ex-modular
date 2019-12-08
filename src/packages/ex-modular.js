@@ -10,11 +10,8 @@ export const exModular = (app) => {
   ex.routes = []
   ex.services = {}
   ex.storages.default = null
-  ex.auth = {
-    systemGroups: {
-      loggedIn: ''
-    }
-  }
+  ex.access = {}
+  ex.session = {}
 
   ex.storages.byName = (name) => {
     if (name === 'default') {
@@ -95,8 +92,7 @@ export const exModular = (app) => {
     if (!model.storage) {
       model.storage = ex.storages.default
     }
-    const aModel = model.storage.modelFromSchema(model)
-    ex.models[model.name] = aModel
+    ex.models[model.name] = model.storage.modelFromSchema(model)
   }
 
   ex.routesAdd = (routes) => {
