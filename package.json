@@ -12,9 +12,6 @@
     "lint": "eslint",
     "build": "cross-env BABEL_ENV=production babel src --out-dir lib"
   },
-  "files": [
-    "src"
-  ],
   "publishConfig": {
     "access": "public"
   },

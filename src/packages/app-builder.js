@@ -17,6 +17,7 @@ import { Session } from './model-session'
 import { AuthJwt as Auth } from './auth-jwt'
 import { AccessSimple as Access } from './access-simple'
 import { UserGroup } from './model-user-group'
+import { SignupOpen } from './signup-open'
 
 export const appBuilder = (express, options) => {
   if (!express) {
@@ -69,10 +70,13 @@ export const appBuilder = (express, options) => {
       app.exModular.services.mailer = Mailer(app)
       app.exModular.services.errors = Errors(app)
       app.exModular.services.validator = Validator(app)
-      app.exModular.services.routeBuilder = RouteBuilder(app)
+      app.exModular.routes.builder = RouteBuilder(app)
       app.exModular.services.controller = Controller(app)
       app.exModular.auth = Auth(app)
       app.exModular.access = Access(app)
+
+      // configure app with modules:
+      SignupOpen(app)
 
       // define storage:
       app.exModular.storagesAdd(sqliteStorage(app))

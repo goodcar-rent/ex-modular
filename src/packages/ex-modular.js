@@ -80,7 +80,7 @@ export const exModular = (app) => {
       if (model.storage === 'default') {
         model.storage = ex.storages.default
       }
-      ex.routesAdd(generateRoutesForModel(app, model))
+      // ex.routesAdd(generateRoutesForModel(app, model))
       // model.
       return model.schemaInit()
     }))
@@ -95,7 +95,7 @@ export const exModular = (app) => {
     ex.models[model.name] = model.storage.modelFromSchema(model)
   }
 
-  ex.routesAdd = (routes) => {
+  ex.routes.Add = (routes) => {
     // convert routes to array
     if (!Array.isArray(routes)) {
       routes = [routes]
