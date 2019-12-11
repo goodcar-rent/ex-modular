@@ -101,27 +101,6 @@ export const routeRemove = (app, Model) => {
   }
 }
 
-export const generateRoute = (app, Model, routeName) => {
-  switch (routeName) {
-    case listRouteName: return routeList(app, Model)
-    case createRouteName: return routeCreate(app, Model)
-    case itemRouteName: return routeItem(app, Model)
-    case saveRouteName: return routeSave(app, Model)
-    case removeRouteName: return routeRemove(app, Model)
-    case removeAllRouteName: return routeRemoveAll(app, Model)
-  }
-  throw new Error(`generateRoute: invalid routeName ${routeName}`)
-}
-
-export const generateRoutesForModel = (app, Model) => {
-  if (!app || !Model || !Model.generateRoutes) {
-    return []
-  }
-  return Model.generateRoutes.map((routeName) => {
-    return generateRoute(app, Model, routeName)
-  })
-}
-
 export const RouteBuilder = (app) => {
   app.exModular.modulesAdd({
     moduleName: packageName,
@@ -148,34 +127,22 @@ export const RouteBuilder = (app) => {
   })
 
   const routesForModel = (model) => {
-    if (model && model.routes) {
-      model.routes.map((route) => {
-        switch (route.method) {
-          case 'GET':
-            app.get(route.path, app.wrap(route.handler))
-            break
-          case 'POST':
-            app.post(route.path, app.wrap(route.handler))
-            break
-          case 'PUT':
-            app.put(route.path, app.wrap(route.handler))
-            break
-          case 'DELETE':
-            app.delete(route.path, app.wrap(route.handler))
-            break
-          case 'ALL':
-            app.all(route.path, app.wrap(route.handler))
-            break
+    if (model && model.generateRoutes) {
+      app.exModular.routes.Add(model.generateRoutes.map((routeName) => {
+        switch (routeName) {
+          case listRouteName: return routeList(app, model)
+          case createRouteName: return routeCreate(app, model)
+          case itemRouteName: return routeItem(app, model)
+          case saveRouteName: return routeSave(app, model)
+          case removeRouteName: return routeRemove(app, model)
+          case removeAllRouteName: return routeRemoveAll(app, model)
         }
-      })
+        throw new Error(`generateRoute: invalid routeName ${routeName}`)
+      }))
     }
   }
 
   const routesForAllModels = () => {
-    // if (!router) {
-    //   router = app.express.Router()
-    // }
-
     const keys = Object.keys(app.exModular.models)
     keys.map((modelName) => {
       const model = app.models[modelName]
@@ -185,9 +152,37 @@ export const RouteBuilder = (app) => {
     })
   }
 
+  const generateRoutes = () => {
+    const Wrap = app.exModular.services.wrap
+
+    return Promise.resolve()
+      .then(() => {
+        app.exModular.routes.map((route) => {
+          switch (route.method) {
+            case 'GET':
+              app.get(route.path, Wrap(route.handler))
+              break
+            case 'POST':
+              app.post(route.path, Wrap(route.handler))
+              break
+            case 'PUT':
+              app.put(route.path, Wrap(route.handler))
+              break
+            case 'DELETE':
+              app.delete(route.path, Wrap(route.handler))
+              break
+            case 'ALL':
+              app.all(route.path, Wrap(route.handler))
+              break
+          }
+        })
+      })
+      .catch((e) => { throw e })
+  }
+
   return {
     forModel: routesForModel,
-    forAllModels: routesForAllModels
-
+    forAllModels: routesForAllModels,
+    generateRoutes
   }
 }

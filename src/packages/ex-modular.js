@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { generateRoutesForModel } from './route-builder'
 
 export const exModular = (app) => {
   const ex = {}

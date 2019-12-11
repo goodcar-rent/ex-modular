@@ -14,7 +14,8 @@ export const SignupOpen = (app) => {
       'models.User',
       'models.User.create',
       'models.User.count',
-      'access.addAdmin'
+      'access.addAdmin',
+      'routes.Add'
     ]
   })
 
@@ -63,7 +64,7 @@ export const SignupOpen = (app) => {
   }
 
   // define routes for this module
-  app.exModular.routesAdd([
+  app.exModular.routes.Add([
     {
       method: 'POST',
       name: 'Auth.Signup',

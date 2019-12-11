@@ -100,20 +100,21 @@ export const appBuilder = (express, options) => {
       //   next(createError(404))
       // })
       //
-      // // error handler
-      // app.use(function (err, req, res, next) {
-      //   // set locals, only providing error in development
-      //   res.locals.message = err.message
-      //   res.locals.error = req.app.get('env') === 'development' ? err : {}
-      //
-      //   // render the error page
-      //   res.status(err.status || 500)
-      //   res.render('error')
-      // })
+
+      // error handler
+      app.use(function (err, req, res, next) {
+        // providing error in development / testing
+        const payload = {}
+        payload.error = (req.app.get('env') === 'development' ? err : (req.app.get('env') === 'test' ? err : {}))
+
+        // render the error page
+        res.status(err.status || 500).json(payload)
+      })
       return app
     })
     .then((app) => app.exModular.storagesInit()) // init storages
     .then(() => app.exModular.modelsInit())
+    .then(() => app.exModular.routes.builder.generateRoutes())
     .then(() => app)
     .catch((err) => { throw err })
 }
