@@ -33,10 +33,10 @@ export const expected = {
 }
 
 export const signupUser = (context, user, expectedCode) => context.request.post(`${context.apiRoot}/auth/signup`)
-  .send(user || UserAdmin)
   .type('json')
   .accept('json')
   .expect(expectedCode || expected.Ok)
+  .send(user || UserAdmin)
 
 export const loginAs = (context, user, expectedCode) => context.request.post(`${context.apiRoot}/auth/login`)
   .send({
@@ -53,6 +53,7 @@ export const loginAs = (context, user, expectedCode) => context.request.post(`${
     }
     return res
   })
+  .catch((e) => { throw e })
 
 export const logout = (context, expectedCode) => context.request.get(`${context.apiRoot}/auth/logout`)
   .set('Authorization', `${context.authSchema} ${context.token}`)

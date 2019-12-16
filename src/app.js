@@ -9,9 +9,6 @@ import env from 'dotenv-safe'
 env.config()
 
 // build app & server
-const app = appBuilder(express, {})
-
-// run server
-app
+appBuilder(express, {})
   .then((app) => serverBuilder(app, {}))
   .catch((e) => { throw e })

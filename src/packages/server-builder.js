@@ -1,6 +1,7 @@
 import Debug from 'debug'
 import http from 'http'
 import os from 'os'
+import listEndpoints from 'express-list-endpoints'
 
 export const serverBuilder = (app, options) => {
   const onError = (error) => {
@@ -61,6 +62,8 @@ export const serverBuilder = (app, options) => {
       app.server.on('error', onError)
       app.server.on('listening', onListening)
       app.server.on('close', onClose)
+
+      console.log(listEndpoints(app))
     })
     .then(() => app)
     .catch((e) => { throw e })

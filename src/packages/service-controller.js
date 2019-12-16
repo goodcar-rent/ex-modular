@@ -9,9 +9,6 @@ export const Controller = (app) => {
       'services.errors.ServerGenericError',
       'services.errors.ServerInvalidParameters',
       'services.errors.ServerNotFound',
-      'services.validator',
-      'services.validator.validatorFromModel',
-      'services.validator.paramId',
       'models',
       'express',
       'services.wrap'
@@ -49,12 +46,12 @@ export const Controller = (app) => {
   }
 
   const create = (Model) => (req, res) => {
-    // validate that body have proper object without ID:
-    const validations = app.exModular.services.validator.validatorFromModel(Model)
+    if (!req.data) {
+      throw new app.exModular.services.errors.ServerInvalidParameters('req.data','', 'save: no req.data')
+    }
 
     // perform create instance:
-    return app.exModular.services.validator.applyValidationsToReq(validations, req)
-      .then(() => Model.create(req.matchedData))
+    return Model.create(req.data)
       .then((item) => {
         res.status(201).json(item)
         return item
@@ -70,6 +67,9 @@ export const Controller = (app) => {
 
   const item = (Model) => (req, res) => {
     // validate that req have id param
+    if (!req.params.id) {
+      throw new app.exModular.services.errors.ServerInvalidParameters('req.params.id','', 'save: no req.params.id')
+    }
 
     return Model.findById(req.params.id)
       .then((foundData) => {
@@ -90,17 +90,18 @@ export const Controller = (app) => {
 
   const save = (Model) => (req, res) => {
     // validate that body have properly shaped object:
+    if (!req.data) {
+      throw new app.exModular.services.errors.ServerInvalidParameters('req.data','', 'save: no req.data')
+    }
+    // validate that req have id param
+    if (!req.params.id) {
+      throw new app.exModular.services.errors.ServerInvalidParameters('req.params.id','', 'save: no req.params.id')
+    }
 
-    // console.log('body:')
-    // console.log(req.body)
-    // console.log('matchedData:')
-    // console.log(req.matchedData)
-    req.matchedData.id = req.params.id
-    const validations = app.exModular.services.validator.validatorFromModel(Model)
+    req.data.id = req.params.id
 
     // perform create instance:
-    return app.exModular.services.validator.applyValidationsToReq(validations, req)
-      .then(() => Model.update(req.matchedData))
+    return Model.update(req.data)
       .then((foundData) => {
         res.status(200).json(foundData)
         return foundData
@@ -116,6 +117,10 @@ export const Controller = (app) => {
 
   const remove = (Model) => (req, res) => {
     // check for id:
+    // validate that req have id param
+    if (!req.params.id) {
+      throw new app.exModular.services.errors.ServerInvalidParameters('req.params.id','', 'save: no req.params.id')
+    }
 
     return Model.removeById(req.params.id)
       .then((foundData) => {

@@ -16,6 +16,7 @@ import { User } from './model-user'
 import { Session } from './model-session'
 import { AuthJwt as Auth } from './auth-jwt'
 import { AccessSimple as Access } from './access-simple'
+import { initData as AccessSystemInitData } from './access-system'
 import { UserGroup } from './model-user-group'
 import { SignupOpen } from './signup-open'
 
@@ -75,9 +76,6 @@ export const appBuilder = (express, options) => {
       app.exModular.auth = Auth(app)
       app.exModular.access = Access(app)
 
-      // configure app with modules:
-      SignupOpen(app)
-
       // define storage:
       app.exModular.storagesAdd(sqliteStorage(app))
 
@@ -85,6 +83,12 @@ export const appBuilder = (express, options) => {
       app.exModular.modelAdd(User(app))
       app.exModular.modelAdd(UserGroup(app))
       app.exModular.modelAdd(Session(app))
+
+      // configure app with modules:
+      SignupOpen(app)
+
+      // configure system data init:
+      app.exModular.access.initData = AccessSystemInitData(app)
 
       // check dependings among installed modules (plugins):
       app.exModular.checkDeps()
@@ -102,19 +106,22 @@ export const appBuilder = (express, options) => {
       //
 
       // error handler
-      app.use(function (err, req, res, next) {
+      app.exModular.services.errors.handler = (err, req, res, next) => {
         // providing error in development / testing
         const payload = {}
         payload.error = (req.app.get('env') === 'development' ? err : (req.app.get('env') === 'test' ? err : {}))
 
         // render the error page
         res.status(err.status || 500).json(payload)
-      })
+      }
+
       return app
     })
     .then((app) => app.exModular.storagesInit()) // init storages
     .then(() => app.exModular.modelsInit())
+    .then(() => app.exModular.routes.builder.forAllModels())
     .then(() => app.exModular.routes.builder.generateRoutes())
+    .then(() => app.exModular.access.initData())
     .then(() => app)
     .catch((err) => { throw err })
 }

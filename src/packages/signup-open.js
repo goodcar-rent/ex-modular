@@ -8,7 +8,7 @@ export const SignupOpen = (app) => {
       'services.errors.ServerError',
       'services.errors.ServerGenericError',
       'services.validator',
-      'services.validator.validatorFromModel',
+      'services.validator.checkBodyForModelName',
       'services.validator.paramId',
       'models',
       'models.User',
@@ -29,7 +29,6 @@ export const SignupOpen = (app) => {
     }
 
     /*
-
     Generic signup code for "open" policy:
     * everybody can signup
     * first user will be admin automatically
@@ -63,6 +62,7 @@ export const SignupOpen = (app) => {
       })
   }
 
+  const Validator = app.exModular.services.validator
   // define routes for this module
   app.exModular.routes.Add([
     {
@@ -71,10 +71,7 @@ export const SignupOpen = (app) => {
       description: 'Open signup via username/password',
       path: '/auth/signup',
       handler: signup,
-      /* TODO: validatorFromSchema
-      validate: {
-        body: app.validator.validatorFromModel(Model)
-      }, */
+      validate: Validator.checkBodyForModelName('User', { optionalId: true }),
       /*
       beforeHandler: [ app.exModular.auth.optional ],
       */

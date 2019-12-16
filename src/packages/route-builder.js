@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 const packageName = 'route-builder package'
 
 export const listRouteName = 'list'
@@ -35,9 +37,9 @@ export const routeCreate = (app, Model) => {
     description: `Create new "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}`,
     handler: app.exModular.services.controller.create(Model),
-    validate: {
-      body: app.exModular.services.validator.validatorFromModel(Model)
-    },
+    validate: [
+      app.exModular.services.validator.checkBodyForModel(Model)
+    ],
     type: 'Model',
     object: Model
   }
@@ -62,9 +64,9 @@ export const routeItem = (app, Model) => {
     description: `Get single item of "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.item(Model),
-    validate: {
-      params: app.exModular.services.validator.paramId
-    },
+    validate: [
+      app.exModular.services.validator.paramId
+    ],
     type: 'Model',
     object: Model
   }
@@ -77,10 +79,10 @@ export const routeSave = (app, Model) => {
     description: `Save (update) single item in "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.save(Model),
-    validate: {
-      params: app.exModular.services.validator.paramId,
-      body: app.exModular.services.validator.validatorFromModel(Model)
-    },
+    validate: [
+      app.exModular.services.validator.paramId,
+      app.exModular.services.validator.checkBodyForModel(Model)
+    ],
     type: 'Model',
     object: Model
   }
@@ -93,9 +95,9 @@ export const routeRemove = (app, Model) => {
     description: `Delete single item in "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.remove(Model),
-    validate: {
-      params: app.exModular.services.validator.paramId
-    },
+    validate: [
+      app.exModular.services.validator.paramId
+    ],
     type: 'Model',
     object: Model
   }
@@ -111,8 +113,8 @@ export const RouteBuilder = (app) => {
       'services.errors.ServerInvalidParameters',
       'services.errors.ServerNotFound',
       'services.validator',
-      'services.validator.validatorFromModel',
       'services.validator.paramId',
+      'services.validator.checkBodyForModel',
       'services.controller',
       'services.controller.list',
       'services.controller.create',
@@ -145,11 +147,10 @@ export const RouteBuilder = (app) => {
   const routesForAllModels = () => {
     const keys = Object.keys(app.exModular.models)
     keys.map((modelName) => {
-      const model = app.models[modelName]
-      if (model && model.routes) {
-        routesForModel(model)
-      }
+      const model = app.exModular.models[modelName]
+      app.exModular.routes.Add(routesForModel(model))
     })
+    return app
   }
 
   const generateRoutes = () => {
@@ -158,25 +159,36 @@ export const RouteBuilder = (app) => {
     return Promise.resolve()
       .then(() => {
         app.exModular.routes.map((route) => {
+          let handlers = []
+          if (route.validate) {
+            handlers = _.concat(handlers, _.flattenDeep(route.validate))
+          }
+          handlers = _.concat(handlers, Wrap(route.handler))
           switch (route.method) {
             case 'GET':
-              app.get(route.path, Wrap(route.handler))
+              app.get(route.path, handlers)
               break
             case 'POST':
-              app.post(route.path, Wrap(route.handler))
+              app.post(route.path, handlers)
               break
             case 'PUT':
-              app.put(route.path, Wrap(route.handler))
+              app.put(route.path, handlers)
               break
             case 'DELETE':
-              app.delete(route.path, Wrap(route.handler))
+              app.delete(route.path, handlers)
               break
             case 'ALL':
-              app.all(route.path, Wrap(route.handler))
+              app.all(route.path, handlers)
               break
           }
         })
       })
+      .then(() => {
+        if (app.exModular.services.errors.handler) {
+          app.use(app.exModular.services.errors.handler)
+        }
+      })
+      .then(() => app)
       .catch((e) => { throw e })
   }
 

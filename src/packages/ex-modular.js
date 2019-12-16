@@ -95,6 +95,7 @@ export const exModular = (app) => {
   }
 
   ex.routes.Add = (routes) => {
+    if (!routes) return
     // convert routes to array
     if (!Array.isArray(routes)) {
       routes = [routes]

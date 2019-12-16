@@ -9,11 +9,9 @@ export default (app) => {
   }
 
   const aStorage = {
-    db: {},
+    db: null,
     name: 'KNEX-SQLite',
     modelFromSchema: knexStorage.modelFromSchema,
-    processBeforeSaveToStorage: knexStorage.processBeforeSaveToStorage,
-    processAfterLoadFromStorage: knexStorage.processAfterLoadFromStorage,
     mapPropToKnexTable: (prop, table) => {
       switch (prop.type) {
         case 'id':
