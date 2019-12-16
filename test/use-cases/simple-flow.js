@@ -68,10 +68,8 @@ describe('ex-modular tests', function () {
 
   describe('First use-case:', function () {
     it('Register first user account', function () {
-      console.log('1')
       return signupUser(context, UserAdmin)
         .then((res) => {
-          console.log('2')
           expect(res.body).to.exist('Body should exist')
           expect(res.body).to.be.an('object')
           expect(res.body.email).to.exist()
@@ -79,7 +77,6 @@ describe('ex-modular tests', function () {
           return loginAs(context, UserAdmin)
         })
         .then((res) => {
-          console.log('3')
           expect(res.body).to.exist('res.body should exist')
           expect(res.body.token).to.exist('res.body.token should exist')
 

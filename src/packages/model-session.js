@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4'
+import _ from 'lodash'
 import { crudRoutes } from './route-builder'
 
 export const Session = (app, options) => {
@@ -7,7 +8,7 @@ export const Session = (app, options) => {
   }
   options.storage = options.storage || 'default'
 
-  return {
+  const Model = {
     name: 'Session',
     priority: 0,
     generateRoutes: crudRoutes,
@@ -32,6 +33,21 @@ export const Session = (app, options) => {
         type: 'text',
         default: null
       }
-    ]
+    ],
+    createOrUpdate: (item) => {
+      return Model.findOne({ where: { userId: item.userId, ip: item.ip } })
+        .then((res) => {
+          if (!res) {
+            return Model.create(item)
+          } else {
+            _.assign(item, res)
+            item.createdAt = new Date()
+            item.id = res.id
+            return Model.update(item)
+          }
+        })
+        .catch((e) => { throw e })
+    }
   }
+  return Model
 }

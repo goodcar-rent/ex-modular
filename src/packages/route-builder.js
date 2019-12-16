@@ -21,7 +21,7 @@ export const crudRoutes = [
 export const routeList = (app, Model) => {
   return {
     method: 'GET',
-    name: `/${Model.name}.${listRouteName}`,
+    name: `${Model.name}.${listRouteName}`,
     description: `Get list of "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}`,
     handler: app.exModular.services.controller.list(Model),
@@ -33,7 +33,7 @@ export const routeList = (app, Model) => {
 export const routeCreate = (app, Model) => {
   return {
     method: 'POST',
-    name: `/${Model.name}.${createRouteName}`,
+    name: `${Model.name}.${createRouteName}`,
     description: `Create new "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}`,
     handler: app.exModular.services.controller.create(Model),
@@ -48,7 +48,7 @@ export const routeCreate = (app, Model) => {
 export const routeRemoveAll = (app, Model) => {
   return {
     method: 'DELETE',
-    name: `/${Model.name}.${removeAllRouteName}`,
+    name: `${Model.name}.${removeAllRouteName}`,
     description: `Delete all items from "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}`,
     handler: app.exModular.services.controller.removeAll(Model),
@@ -60,7 +60,7 @@ export const routeRemoveAll = (app, Model) => {
 export const routeItem = (app, Model) => {
   return {
     method: 'GET',
-    name: `/${Model.name}.${itemRouteName}`,
+    name: `${Model.name}.${itemRouteName}`,
     description: `Get single item of "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.item(Model),
@@ -75,7 +75,7 @@ export const routeItem = (app, Model) => {
 export const routeSave = (app, Model) => {
   return {
     method: 'PUT',
-    name: `/${Model.name}.${saveRouteName}`,
+    name: `${Model.name}.${saveRouteName}`,
     description: `Save (update) single item in "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.save(Model),
@@ -91,7 +91,7 @@ export const routeSave = (app, Model) => {
 export const routeRemove = (app, Model) => {
   return {
     method: 'DELETE',
-    name: `/${Model.name}.${removeRouteName}`,
+    name: `${Model.name}.${removeRouteName}`,
     description: `Delete single item in "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.remove(Model),
@@ -161,6 +161,9 @@ export const RouteBuilder = (app) => {
         app.exModular.routes.map((route) => {
           let handlers = []
           if (route.validate) {
+            if (!Array.isArray(route.validate)) {
+              route.validate = [route.validate]
+            }
             handlers = _.concat(handlers, _.flattenDeep(route.validate))
           }
           handlers = _.concat(handlers, Wrap(route.handler))

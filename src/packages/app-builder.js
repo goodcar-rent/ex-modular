@@ -19,6 +19,7 @@ import { AccessSimple as Access } from './access-simple'
 import { initData as AccessSystemInitData } from './access-system'
 import { UserGroup } from './model-user-group'
 import { SignupOpen } from './signup-open'
+import { AuthPassword } from './auth-password'
 
 export const appBuilder = (express, options) => {
   if (!express) {
@@ -86,6 +87,7 @@ export const appBuilder = (express, options) => {
 
       // configure app with modules:
       SignupOpen(app)
+      AuthPassword(app)
 
       // configure system data init:
       app.exModular.access.initData = AccessSystemInitData(app)

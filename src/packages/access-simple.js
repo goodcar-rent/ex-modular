@@ -21,6 +21,15 @@ export const AccessSimple = (app) => {
       .catch((e) => { throw e })
   }
 
+  const unregisterLoggedUser = (user) => {
+    if (!user || !user.id) {
+      throw Error(`${packageName}.unregisterLoggedUser: invalid param "user" - ${user.toString()}`)
+    }
+
+    return app.exModular.models.UserGroup.usersRemove(accessLoggedIn, user.id)
+      .catch((e) => { throw e })
+  }
+
   const addAdmin = (user) => {
     if (!user || !user.id) {
       throw Error(`${packageName}.addAdmin: invalid param "user" - ${user.toString()}`)
@@ -32,6 +41,7 @@ export const AccessSimple = (app) => {
 
   return {
     registerLoggedUser,
+    unregisterLoggedUser,
     addAdmin
   }
 }
