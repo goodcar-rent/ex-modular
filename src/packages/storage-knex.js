@@ -448,6 +448,9 @@ export default (app) => {
     },
 
     refAdd: (Model, prop) => (id, items) => {
+      if (!Array.isArray(items)) {
+        items = [items]
+      }
       return Model.findById(id)
         .then((item) => {
           if (!item) {
@@ -460,6 +463,9 @@ export default (app) => {
     },
 
     refRemove: (Model, prop) => (id, items) => {
+      if (!Array.isArray(items)) {
+        items = [items]
+      }
       return Model.findById(id)
         .then((item) => {
           if (!item) {
