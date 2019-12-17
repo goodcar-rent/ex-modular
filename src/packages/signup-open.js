@@ -1,7 +1,7 @@
 const packageName = 'Signup-open'
 
 export const SignupOpen = (app) => {
-  app.exModular.modulesAdd({
+  app.exModular.modules.Add({
     moduleName: packageName,
     dependency: [
       'services.errors',

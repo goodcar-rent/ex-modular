@@ -1,7 +1,7 @@
 const packageName = 'Controller'
 
 export const Controller = (app) => {
-  app.exModular.modulesAdd({
+  app.exModular.modules.Add({
     moduleName: packageName,
     dependency: [
       'services.errors',

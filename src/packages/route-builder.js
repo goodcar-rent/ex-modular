@@ -104,7 +104,7 @@ export const routeRemove = (app, Model) => {
 }
 
 export const RouteBuilder = (app) => {
-  app.exModular.modulesAdd({
+  app.exModular.modules.Add({
     moduleName: packageName,
     dependency: [
       'services.errors',

@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-import { describe, it, before } from 'mocha'
+import { describe, it, before, beforeEach } from 'mocha'
 import supertest from 'supertest'
 import chai, { expect } from 'chai'
 import dirtyChai from 'dirty-chai'
@@ -61,7 +61,13 @@ describe('ex-modular tests', function () {
   })
 
   after((done) => {
-    app.exModular.storagesClose()
+    app.exModular.storages.Close()
+      .then(() => done())
+      .catch(done)
+  })
+
+  beforeEach((done) => {
+    app.exModular.storages.Clear()
       .then(() => done())
       .catch(done)
   })

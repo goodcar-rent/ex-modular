@@ -1,7 +1,7 @@
 const packageName = 'Auth-password'
 
 export const AuthPassword = (app) => {
-  app.exModular.modulesAdd({
+  app.exModular.modules.Add({
     moduleName: packageName,
     dependency: [
       'services.errors',

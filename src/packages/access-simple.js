@@ -3,7 +3,7 @@ import { accessLoggedIn, accessAdmin } from './access-system'
 const packageName = 'Access-simple'
 
 export const AccessSimple = (app) => {
-  app.exModular.modulesAdd({
+  app.exModular.modules.Add({
     moduleName: packageName,
     dependency: [
       'models',

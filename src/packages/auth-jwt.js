@@ -4,7 +4,7 @@ const packageName = 'Auth-jwt'
 const DEF_SECRET = 'jhwckjeqfjnqwdoijed'
 
 export const AuthJwt = (app) => {
-  app.exModular.modulesAdd({
+  app.exModular.modules.Add({
     moduleName: packageName,
     dependency: [
       'services.errors',

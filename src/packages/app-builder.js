@@ -78,7 +78,7 @@ export const appBuilder = (express, options) => {
       app.exModular.access = Access(app)
 
       // define storage:
-      app.exModular.storagesAdd(sqliteStorage(app))
+      app.exModular.storages.Add(sqliteStorage(app))
 
       // define models:
       app.exModular.modelAdd(User(app))
@@ -119,7 +119,7 @@ export const appBuilder = (express, options) => {
 
       return app
     })
-    .then((app) => app.exModular.storagesInit()) // init storages
+    .then((app) => app.exModular.storages.Init()) // init storages
     .then(() => app.exModular.modelsInit())
     .then(() => app.exModular.routes.builder.forAllModels())
     .then(() => app.exModular.routes.builder.generateRoutes())

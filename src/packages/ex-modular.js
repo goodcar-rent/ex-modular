@@ -19,12 +19,12 @@ export const exModular = (app) => {
     return _.find(ex.storages, { name })
   }
 
-  ex.modulesAdd = (module) => {
+  ex.modules.Add = (module) => {
     // check storage signature
     ex.modules.push(module)
   }
 
-  ex.storagesAdd = (storage) => {
+  ex.storages.Add = (storage) => {
     // check storage signature
     ex.storages.push(storage)
     if (ex.storages.length === 1) {
@@ -32,19 +32,29 @@ export const exModular = (app) => {
     }
   }
 
-  ex.storagesInit = () => {
+  ex.storages.Init = () => {
     if (!ex.storages || ex.storages.length < 1) {
       throw new Error('.storages should be initialized')
     }
     return Promise.all(ex.storages.map((storage) => storage.storageInit()))
+      .catch((e) => { throw e })
   }
 
-  ex.storagesClose = () => {
+  ex.storages.Close = () => {
     if (!ex.storages || ex.storages.length < 1) {
       throw new Error('.storages should be initialized')
     }
     return Promise.all(ex.storages.map((storage) => storage.storageClose()))
       .catch(e => { throw e })
+  }
+
+  ex.storages.Clear = () => {
+    if (!ex.storages || !ex.models) {
+      throw new Error('.storages should be initialized before initializing model')
+    }
+    return Promise.all(Object.keys(ex.models).map((modelName) => ex.models[modelName].dataClear()))
+      .then(() => app.exModular.access.initData())
+      .catch((e) => { throw e })
   }
 
   ex.checkDeps = () => {
@@ -83,6 +93,7 @@ export const exModular = (app) => {
       // model.
       return model.schemaInit()
     }))
+      .catch((e) => { throw e })
   }
   ex.modelAdd = (model) => {
     if (!model || !model.name || !model.props) {
