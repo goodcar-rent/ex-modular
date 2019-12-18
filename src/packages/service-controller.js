@@ -47,7 +47,8 @@ export const Controller = (app) => {
 
   const create = (Model) => (req, res) => {
     if (!req.data) {
-      throw new app.exModular.services.errors.ServerInvalidParameters('req.data','', 'save: no req.data')
+      throw new app.exModular.services.errors.ServerInvalidParameters(
+        'req.data', '', 'save: no req.data')
     }
 
     // perform create instance:
@@ -68,7 +69,10 @@ export const Controller = (app) => {
   const item = (Model) => (req, res) => {
     // validate that req have id param
     if (!req.params.id) {
-      throw new app.exModular.services.errors.ServerInvalidParameters('req.params.id','', 'save: no req.params.id')
+      throw new app.exModular.services.errors.ServerInvalidParameters(
+        'req.params.id',
+        '',
+        'item: no req.params.id')
     }
 
     return Model.findById(req.params.id)
@@ -91,11 +95,17 @@ export const Controller = (app) => {
   const save = (Model) => (req, res) => {
     // validate that body have properly shaped object:
     if (!req.data) {
-      throw new app.exModular.services.errors.ServerInvalidParameters('req.data','', 'save: no req.data')
+      throw new app.exModular.services.errors.ServerInvalidParameters(
+        'req.data',
+        '',
+        'save: no req.data')
     }
     // validate that req have id param
     if (!req.params.id) {
-      throw new app.exModular.services.errors.ServerInvalidParameters('req.params.id','', 'save: no req.params.id')
+      throw new app.exModular.services.errors.ServerInvalidParameters(
+        'req.params.id',
+        '',
+        'save: no req.params.id')
     }
 
     req.data.id = req.params.id
@@ -119,7 +129,10 @@ export const Controller = (app) => {
     // check for id:
     // validate that req have id param
     if (!req.params.id) {
-      throw new app.exModular.services.errors.ServerInvalidParameters('req.params.id','', 'save: no req.params.id')
+      throw new app.exModular.services.errors.ServerInvalidParameters(
+        'req.params.id',
+        '',
+        'remove: no req.params.id')
     }
 
     return Model.removeById(req.params.id)

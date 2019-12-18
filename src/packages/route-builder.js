@@ -64,9 +64,7 @@ export const routeItem = (app, Model) => {
     description: `Get single item of "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.item(Model),
-    validate: [
-      app.exModular.services.validator.paramId
-    ],
+    validate: app.exModular.services.validator.paramId(Model),
     type: 'Model',
     object: Model
   }
@@ -80,7 +78,7 @@ export const routeSave = (app, Model) => {
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.save(Model),
     validate: [
-      app.exModular.services.validator.paramId,
+      app.exModular.services.validator.paramId(Model),
       app.exModular.services.validator.checkBodyForModel(Model)
     ],
     type: 'Model',
@@ -95,9 +93,7 @@ export const routeRemove = (app, Model) => {
     description: `Delete single item in "${Model.name}" by id`,
     path: `/${Model.name.toLowerCase()}/:id`,
     handler: app.exModular.services.controller.remove(Model),
-    validate: [
-      app.exModular.services.validator.paramId
-    ],
+    validate: app.exModular.services.validator.paramId(Model),
     type: 'Model',
     object: Model
   }
