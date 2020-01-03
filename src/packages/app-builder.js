@@ -107,16 +107,6 @@ export const appBuilder = (express, options) => {
       // })
       //
 
-      // error handler
-      app.exModular.services.errors.handler = (err, req, res, next) => {
-        // providing error in development / testing
-        const payload = {}
-        payload.error = (req.app.get('env') === 'development' ? err : (req.app.get('env') === 'test' ? err : {}))
-
-        // render the error page
-        res.status(err.status || 500).json(payload)
-      }
-
       return app
     })
     .then((app) => app.exModular.storages.Init()) // init storages

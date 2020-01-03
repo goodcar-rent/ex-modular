@@ -37,5 +37,23 @@ export const Errors = (app) => {
     }
   }
 
+  errors.handler = (err, req, res, next) => {
+    // providing error in development / testing
+    const payload = {}
+    payload.error = (req.app.get('env') === 'development' ? err : (req.app.get('env') === 'test' ? err : {}))
+
+    if (err instanceof errors.ServerInvalidUsernamePassword) {
+      err.status = 403
+      payload.message = err.message | 'Invalid username/password'
+    }
+
+    if (err instanceof errors.ServerNotFound) {
+      err.status = 404
+    }
+
+    // render the error page
+    res.status(err.status || 500).json(payload)
+  }
+
   return errors
 }
