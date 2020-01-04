@@ -39,20 +39,33 @@ export const Errors = (app) => {
 
   errors.handler = (err, req, res, next) => {
     // providing error in development / testing
-    const payload = {}
-    payload.error = (req.app.get('env') === 'development' ? err : (req.app.get('env') === 'test' ? err : {}))
+    // const payload = {}
+    // payload.error = (req.app.get('env') === 'development' ? err : (req.app.get('env') === 'test' ? err : {}))
 
-    if (err instanceof errors.ServerInvalidUsernamePassword) {
-      err.status = 403
-      payload.message = err.message | 'Invalid username/password'
+    if (err instanceof errors.ServerError) {
+      if (err instanceof errors.ServerInvalidParameters) {
+        res.status(412).json({ message: err.message, err })
+      } else if (err instanceof errors.ServerInvalidParams) {
+        res.status(412).json({ message: err.message, error: err.errors })
+      } else if (err instanceof errors.ServerInvalidUsernamePassword) {
+        res.status(401).json({ message: err.message, err })
+      } else if (err instanceof errors.ServerNotAllowed) {
+        res.status(403).json({ message: err.message, err })
+      } else if (err instanceof errors.ServerNotFound) {
+        res.status(404).json({
+          message: err.message,
+          resource: err.resource,
+          id: err.id,
+          err
+        })
+      } else if (err instanceof errors.ServerGenericError) {
+        res.status(503).json({ message: 'Generic error', err })
+      } else {
+        res.status(500).json({ message: 'Other server error', err })
+      }
+    } else {
+      res.status(500).json({ message: 'Error', err })
     }
-
-    if (err instanceof errors.ServerNotFound) {
-      err.status = 404
-    }
-
-    // render the error page
-    res.status(err.status || 500).json(payload)
   }
 
   return errors
