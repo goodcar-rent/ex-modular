@@ -281,6 +281,10 @@ export default (app) => {
       }
       const knex = Model.storage.db
 
+      // if (opt) {
+      //   console.log('opt:')
+      //   console.log(opt)
+      // }
       return knex.select()
         .from(Model.name)
         .where(opt ? opt.where : {})
@@ -299,6 +303,11 @@ export default (app) => {
           .db ${Model.storage.db}`))
       }
       const knex = Model.storage.db
+
+      // if (opt) {
+      //   console.log('opt:')
+      //   console.log(opt)
+      // }
 
       return knex.select()
         .from(Model.name)

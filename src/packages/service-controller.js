@@ -16,24 +16,36 @@ export const Controller = (app) => {
   })
 
   const processFilter = (filter) => {
+    // console.log('processFilter')
     let f = {}
-    let ret = {}
+    const ret = {}
     if (!filter) {
       return ret
     }
     try {
       f = JSON.parse(filter)
+      // console.log('parsed:')
+      // console.log(f)
     } catch (e) {
       throw app.exModular.services.errors.ServerInvalidParameters('filter', 'object',
         'Request\'s filter property is invalid JSON object')
     }
 
     const keys = Object.keys(f)
+    // console.log('keys')
+    // console.log(keys)
     keys.map((key) => {
       const item = f[key]
+      // console.log('item')
+      // console.log(item)
       if (Array.isArray(item)) {
+        // console.log('is array')
         if (item.length === 1) {
-          ret.where[key] = f[key]
+          // console.log('len === 1')
+          if (!ret.where) {
+            ret.where = {}
+          }
+          ret.where[key] = f[key][0]
         } else {
           if (!ret.whereIn) {
             ret.whereIn = []
@@ -42,19 +54,17 @@ export const Controller = (app) => {
         }
       }
     })
+    // console.log('ret')
+    // console.log(ret)
+    return ret
   }
 
   const list = (Model) => (req, res) => {
     // process list params: filter, etc
-    if (req.query.filter) {
-      console.log('filter:')
-      console.log(req.query.filter)
-      if (req.query.filter.id) {
-        console.log(req.query.filter.id)
-      }
-    }
+    const opt = processFilter(req.query.filter)
+
     // no params or input objects
-    return Promise.all([Model.findAll(), Model.count()])
+    return Promise.all([Model.findAll(opt), Model.count()])
       .then((data) => {
         const foundData = data[0]
         const count = data[1]
