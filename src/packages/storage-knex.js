@@ -108,8 +108,16 @@ export const processAfterLoadFromStorage = (Model, item) => {
 }
 
 const withWhereIn = (queryBuilder, opt) => {
-  if (opt && opt.whereIn && opt.whereIn.column && opt.whereIn.ids) {
-    queryBuilder.whereIn(opt.whereIn.column, opt.whereIn.ids)
+  if (opt && opt.whereIn) {
+    let op = opt.whereIn
+    if (!Array.isArray(opt.whereIn)) {
+      op = [opt.whereIn]
+    }
+    op.map((item) => {
+      if (item.column && item.ids) {
+        queryBuilder.whereIn(item.column, item.ids)
+      }
+    })
   }
 }
 

@@ -1,4 +1,4 @@
-import { body, param, validationResult, matchedData } from 'express-validator'
+import { body, param, validationResult, matchedData, query } from 'express-validator'
 
 const packageName = 'Service.Validator'
 
@@ -34,6 +34,11 @@ export const Validator = (app) => {
     return checkBodyForModel(model, options)
   }
 
+  const listFilterValidator = (Model, options) => {
+    // const validations = []
+    return query(['filter']).optional()
+  }
+
   const applyValidationsToReq = (validations, req) => {
     return Promise.all(validations.map((validation) => validation.run(req)))
       .then(() => {
@@ -56,6 +61,7 @@ export const Validator = (app) => {
     checkBodyForModelName,
     validateData,
     applyValidationsToReq,
-    paramId
+    paramId,
+    listFilterValidator
   }
 }

@@ -25,6 +25,9 @@ export const routeList = (app, Model) => {
     description: `Get list of "${Model.name}"`,
     path: `/${Model.name.toLowerCase()}`,
     handler: app.exModular.services.controller.list(Model),
+    validate: [
+      app.exModular.services.validator.listFilterValidator(Model)
+    ],
     type: 'Model',
     object: Model
   }
