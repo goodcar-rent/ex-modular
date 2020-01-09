@@ -44,8 +44,8 @@ export const appBuilder = (express, options) => {
   options.cors = options.cors || cors
   options.corsOptions = options.corsOptions || {
     origin: '*',
-    allowedHeaders: 'Content-Type,Authorization,Content-Range,Accept,Accept-Encoding,Accept-Language',
-    exposedHeaders: 'Content-Type,Authorization,Content-Range,Accept,Accept-Encoding,Accept-Language'
+    allowedHeaders: 'Content-Type,Authorization,Content-Range,Accept,Accept-Encoding,Accept-Language,Location,Content-Location',
+    exposedHeaders: 'Content-Type,Authorization,Content-Range,Accept,Accept-Encoding,Accept-Language,Location,Content-Location'
   }
 
   // return promise that builds app:

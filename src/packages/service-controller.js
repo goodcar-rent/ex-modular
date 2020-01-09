@@ -252,7 +252,7 @@ export const Controller = (app) => {
         if (error instanceof app.exModular.services.errors.ServerError) {
           throw error
         } else {
-          console.log(error)
+          // console.log(error)
           throw new app.exModular.services.errors.ServerGenericError(error)
         }
       })
@@ -267,6 +267,8 @@ export const Controller = (app) => {
     // perform create instance:
     return Model.create(req.data)
       .then((item) => {
+        res.set('Location', `${req.path}/${item.id}`)
+        res.set('Content-Location', `${req.path}/${item.id}`)
         res.status(201).json(item)
         return item
       })
