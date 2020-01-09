@@ -58,12 +58,7 @@ export const Controller = (app) => {
       // console.log('item')
       // console.log(item)
 
-      // find prop name:
-      const prop = _.find(Model.props, { name: propName })
-      if (!prop) {
-        throw app.exModular.services.errors.ServerInvalidParameters(`filter.${propName}`, 'object',
-          `Request's filter param "${propName}" not found in model "${Model.name}"`)
-      }
+      // decorate ret value with proper bags:
       if (!ret.where) {
         ret.where = {}
       }
@@ -73,28 +68,48 @@ export const Controller = (app) => {
       if (!ret.whereOp) {
         ret.whereOp = []
       }
+      if (!ret.whereQ) {
+        ret.whereQ = []
+      }
 
-      if (Array.isArray(val)) {
-        if (op !== '') {
-          throw app.exModular.services.errors.ServerInvalidParameters('filter', 'object',
-            'Request\'s filter property have invalid syntax - operation combined with array of values')
-        }
-        // console.log('is array')
-        if (val.length === 1) {
-          // console.log('len === 1')
-          ret.where[key] = f[key][0]
-        } else {
-          ret.whereIn.push({ column: key, ids: val })
-        }
-      } else if (op !== '') {
-        // add operations:
-        ret.whereOp.push({ column: propName, op, value: val })
+      if (key === 'q') {
+        // handle special filter Q: add FTS-like search to all text fields:
+        Model.props.map((prop) => {
+          if (prop.type === 'text') {
+            ret.whereQ.push({ column: prop.name, op: 'like', value: `%${val}%` })
+          }
+        })
       } else {
-        // simple propName, add like op for text, exact match for other fields:
-        if (prop.type === 'text') {
-          ret.whereOp.push({ column: propName, op: 'like', value: `%${val}%` })
+        // handle other filter types:
+        // check if prop is exist in Model: (? dot-accessed fields in associations)
+        const prop = _.find(Model.props, { name: propName })
+        if (!prop) {
+          throw app.exModular.services.errors.ServerInvalidParameters(`filter.${propName}`, 'object',
+            `Request's filter param "${propName}" not found in model "${Model.name}"`)
+        }
+        if (Array.isArray(val)) {
+          // if value is array:
+          // console.log('is array')
+          if (op !== '') {
+            throw app.exModular.services.errors.ServerInvalidParameters('filter', 'object',
+              'Request\'s filter property have invalid syntax - operation combined with array of values')
+          }
+          if (val.length === 1) {
+            // console.log('len === 1')
+            ret.where[key] = f[key][0]
+          } else {
+            ret.whereIn.push({ column: key, ids: val })
+          }
+        } else if (op !== '') {
+          // add decoded operation (encoded with _lt, _gte, etc in prop name):
+          ret.whereOp.push({ column: propName, op, value: val })
         } else {
-          ret.where[propName] = val
+          // simple propName, add like op for text, exact match for other fields:
+          if (prop.type === 'text') {
+            ret.whereOp.push({ column: propName, op: 'like', value: `%${val}%` })
+          } else {
+            ret.where[propName] = val
+          }
         }
       }
     })

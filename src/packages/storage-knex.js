@@ -135,6 +135,22 @@ const withWhereOp = (queryBuilder, opt) => {
   }
 }
 
+const withWhereQ = (queryBuilder, opt) => {
+  if (opt && opt.whereQ) {
+    let op = opt.whereQ
+    if (!Array.isArray(op)) {
+      op = [opt.whereQ]
+    }
+    queryBuilder.andWhere((qb) => {
+      op.map((item) => {
+        if (item.column && item.op && item.value) {
+          qb.orWhere(item.column, item.op, item.value)
+        }
+      })
+    })
+  }
+}
+
 export default (app) => {
   const aStorage = {
     db: {},
@@ -328,6 +344,7 @@ export default (app) => {
         .where((opt && opt.where) ? opt.where : {})
         .modify(withWhereIn, opt)
         .modify(withWhereOp, opt)
+        .modify(withWhereQ, opt)
         .then((res) => res.map((item) => processAfterLoadFromStorage(Model, item)))
         .then((res) => {
           // console.log('res:')
