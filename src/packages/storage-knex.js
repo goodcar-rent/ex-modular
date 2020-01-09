@@ -151,6 +151,16 @@ const withWhereQ = (queryBuilder, opt) => {
   }
 }
 
+const withOrderBy = (queryBuilder, opt) => {
+  if (opt && opt.orderBy) {
+    let op = opt.orderBy
+    if (!Array.isArray(op)) {
+      op = [opt.whereQ]
+    }
+    queryBuilder.orderBy(op)
+  }
+}
+
 export default (app) => {
   const aStorage = {
     db: {},
@@ -345,6 +355,7 @@ export default (app) => {
         .modify(withWhereIn, opt)
         .modify(withWhereOp, opt)
         .modify(withWhereQ, opt)
+        .modify(withOrderBy, opt)
         .then((res) => res.map((item) => processAfterLoadFromStorage(Model, item)))
         .then((res) => {
           // console.log('res:')

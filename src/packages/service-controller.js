@@ -118,9 +118,55 @@ export const Controller = (app) => {
     return ret
   }
 
+  const processSort = (Model, req, opt) => {
+    const ret = opt || {}
+
+    if (!req || !req.query || !req.query.sort) {
+      return ret
+    }
+
+    const sort = req.query.sort
+    // console.log(sort)
+    let f = {}
+    try {
+      f = JSON.parse(sort)
+      // console.log('parsed:')
+      // console.log(f)
+    } catch (e) {
+      throw app.exModular.services.errors.ServerInvalidParameters('sort', 'object',
+        'Request\'s sort property is invalid JSON array')
+    }
+
+    if (!Array.isArray(f)) {
+      throw app.exModular.services.errors.ServerInvalidParameters('sort', 'object',
+        'Request\'s sort property is not an array')
+    }
+
+    if (f.length % 2) {
+      throw app.exModular.services.errors.ServerInvalidParameters('sort', 'object',
+        'Request\'s sort property should be an array with tuples (number of items should be multiply of 2)')
+    }
+
+    if (!ret.orderBy) {
+      ret.orderBy = []
+    }
+
+    for (let ndx = 0; ndx < f.length; ndx += 2) {
+      if (!_.find(Model.props, { name: f[ndx] })) {
+        throw app.exModular.services.errors.ServerInvalidParameters(`sort[${ndx}]`, 'object',
+          `Sort field "${f[ndx]}" not found in model "${Model.name}"`)
+      }
+      ret.orderBy.push({ column: f[ndx], order: f[ndx + 1].toLowerCase() })
+    }
+
+    // console.log(ret)
+    return ret
+  }
+
   const list = (Model) => (req, res) => {
     // process list params: filter, etc
-    const opt = processFilter(Model, req.query.filter)
+    let opt = processFilter(Model, req.query.filter)
+    opt = processSort(Model, req, opt)
 
     // console.log('opt:')
     // console.log(opt)
