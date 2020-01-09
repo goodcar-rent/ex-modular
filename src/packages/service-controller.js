@@ -46,7 +46,7 @@ export const Controller = (app) => {
       } else if (_.endsWith(key, '_gte')) {
         propName = key.substring(0, key.length - 4)
         op = '>='
-      } else if (_.endsWith(key,'_lt')) {
+      } else if (_.endsWith(key, '_lt')) {
         propName = key.substring(0, key.length - 3)
         op = '<'
       } else if (_.endsWith(key, '_lte')) {
@@ -236,7 +236,15 @@ export const Controller = (app) => {
         // }
         // console.log('res:')
         // console.log(foundData)
-        res.set('Content-Range', `${Model.name} ${opt.range[0] || 0}-${opt.range[1] || count}/${count}`)
+        let range0 = 0
+        let range1 = count
+        if (opt && opt.range && opt.range[0]) {
+          range0 = opt.range[0]
+        }
+        if (opt && opt.range && opt.range[1]) {
+          range1 = opt.range[1]
+        }
+        res.set('Content-Range', `${Model.name} ${range0}-${range1}/${count}`)
         res.status(200).json(foundData)
         return foundData
       })
