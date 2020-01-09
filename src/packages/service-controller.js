@@ -163,10 +163,60 @@ export const Controller = (app) => {
     return ret
   }
 
+  const processRange = (Model, req, opt) => {
+    const ret = opt || {}
+
+    if ((!req || !req.query || !req.query.range) &&
+      (!req || !req.query || !req.query.page)) {
+      return ret
+    }
+
+    if (req.query.range) {
+      const range = req.query.range
+      // console.log(sort)
+      let f = {}
+      try {
+        f = JSON.parse(range)
+        // console.log('parsed:')
+        // console.log(f)
+      } catch (e) {
+        throw app.exModular.services.errors.ServerInvalidParameters('range', 'object',
+          'Request\'s range query parameter is mailformed JSON object - should be array')
+      }
+
+      if (!Array.isArray(f)) {
+        throw app.exModular.services.errors.ServerInvalidParameters('range', 'object',
+          'Request\'s range property is not an array')
+      }
+
+      if (f.length !== 2) {
+        throw app.exModular.services.errors.ServerInvalidParameters('range', 'object',
+          'Request\'s range property should be an array with two values - range start and end')
+      }
+
+      if (!ret.range) {
+        ret.range = []
+      }
+
+      if (f[1] < f[0]) {
+        f[1] = f[0]
+      }
+
+      ret.range[0] = f[0]
+      ret.range[1] = f[1]
+      return ret
+    } else if (req.query.page && req.query.perPage) {
+      // console.log('page:')
+      // console.log(req.query.page)
+      // console.log(req.query.perPage)
+    }
+  }
+
   const list = (Model) => (req, res) => {
     // process list params: filter, etc
     let opt = processFilter(Model, req.query.filter)
     opt = processSort(Model, req, opt)
+    opt = processRange(Model, req, opt)
 
     // console.log('opt:')
     // console.log(opt)
@@ -186,7 +236,7 @@ export const Controller = (app) => {
         // }
         // console.log('res:')
         // console.log(foundData)
-        res.set('Content-Range', `${Model.name} 0-${count}/${count}`)
+        res.set('Content-Range', `${Model.name} ${opt.range[0] || 0}-${opt.range[1] || count}/${count}`)
         res.status(200).json(foundData)
         return foundData
       })

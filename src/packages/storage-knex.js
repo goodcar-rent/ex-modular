@@ -155,9 +155,21 @@ const withOrderBy = (queryBuilder, opt) => {
   if (opt && opt.orderBy) {
     let op = opt.orderBy
     if (!Array.isArray(op)) {
-      op = [opt.whereQ]
+      op = [opt.orderBy]
     }
     queryBuilder.orderBy(op)
+  }
+}
+
+const withRange = (queryBuilder, opt) => {
+  if (opt && opt.range) {
+    let op = opt.range
+    if (!Array.isArray(op)) {
+      op = [opt.range]
+    }
+    // console.log('range')
+    // console.log(`[${op[0]}, lim ${op[1] - op[0] + 1}]`)
+    queryBuilder.offset(op[0]).limit(op[1] - op[0] + 1)
   }
 }
 
@@ -356,6 +368,7 @@ export default (app) => {
         .modify(withWhereOp, opt)
         .modify(withWhereQ, opt)
         .modify(withOrderBy, opt)
+        .modify(withRange, opt)
         .then((res) => res.map((item) => processAfterLoadFromStorage(Model, item)))
         .then((res) => {
           // console.log('res:')
