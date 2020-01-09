@@ -17,7 +17,6 @@ export const Controller = (app) => {
     ]
   })
 
-  const processFilter = (filter) => {
   const processFilter = (Model, filter) => {
     // console.log('processFilter')
     let f = {}
