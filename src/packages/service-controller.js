@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 const packageName = 'Controller'
 
 export const Controller = (app) => {
@@ -16,6 +18,7 @@ export const Controller = (app) => {
   })
 
   const processFilter = (filter) => {
+  const processFilter = (Model, filter) => {
     // console.log('processFilter')
     let f = {}
     const ret = {}
@@ -35,22 +38,64 @@ export const Controller = (app) => {
     // console.log('keys')
     // console.log(keys)
     keys.map((key) => {
-      const item = f[key]
+      // console.log(`Processing key ${key}`)
+      let propName = key
+      let op = ''
+      if (_.endsWith(key, '_gt')) {
+        propName = key.substring(0, key.length - 3)
+        op = '>'
+      } else if (_.endsWith(key, '_gte')) {
+        propName = key.substring(0, key.length - 4)
+        op = '>='
+      } else if (_.endsWith(key,'_lt')) {
+        propName = key.substring(0, key.length - 3)
+        op = '<'
+      } else if (_.endsWith(key, '_lte')) {
+        propName = key.substring(0, key.length - 4)
+        op = '<='
+      }
+      const val = f[key]
+      // console.log(`propName=${propName}, op=${op}, val=${val}`)
       // console.log('item')
       // console.log(item)
-      if (Array.isArray(item)) {
+
+      // find prop name:
+      const prop = _.find(Model.props, { name: propName })
+      if (!prop) {
+        throw app.exModular.services.errors.ServerInvalidParameters(`filter.${propName}`, 'object',
+          `Request's filter param "${propName}" not found in model "${Model.name}"`)
+      }
+      if (!ret.where) {
+        ret.where = {}
+      }
+      if (!ret.whereIn) {
+        ret.whereIn = []
+      }
+      if (!ret.whereOp) {
+        ret.whereOp = []
+      }
+
+      if (Array.isArray(val)) {
+        if (op !== '') {
+          throw app.exModular.services.errors.ServerInvalidParameters('filter', 'object',
+            'Request\'s filter property have invalid syntax - operation combined with array of values')
+        }
         // console.log('is array')
-        if (item.length === 1) {
+        if (val.length === 1) {
           // console.log('len === 1')
-          if (!ret.where) {
-            ret.where = {}
-          }
           ret.where[key] = f[key][0]
         } else {
-          if (!ret.whereIn) {
-            ret.whereIn = []
-          }
-          ret.whereIn.push({ column: key, ids: item })
+          ret.whereIn.push({ column: key, ids: val })
+        }
+      } else if (op !== '') {
+        // add operations:
+        ret.whereOp.push({ column: propName, op, value: val })
+      } else {
+        // simple propName, add like op for text, exact match for other fields:
+        if (prop.type === 'text') {
+          ret.whereOp.push({ column: propName, op: 'like', value: `%${val}%` })
+        } else {
+          ret.where[propName] = val
         }
       }
     })
@@ -61,7 +106,10 @@ export const Controller = (app) => {
 
   const list = (Model) => (req, res) => {
     // process list params: filter, etc
-    const opt = processFilter(req.query.filter)
+    const opt = processFilter(Model, req.query.filter)
+
+    // console.log('opt:')
+    // console.log(opt)
 
     // no params or input objects
     return Promise.all([Model.findAll(opt), Model.count()])
@@ -77,7 +125,7 @@ export const Controller = (app) => {
         //   console.log(count)
         // }
         // console.log('res:')
-        // console.log(res)
+        // console.log(foundData)
         res.set('Content-Range', `${Model.name} 0-${count}/${count}`)
         res.status(200).json(foundData)
         return foundData
