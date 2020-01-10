@@ -1,4 +1,5 @@
 {
   "require": "@babel/register",
-  "timeout": "7000"
+  "reporter": "spec",
+  "timeout": "17000"
 }

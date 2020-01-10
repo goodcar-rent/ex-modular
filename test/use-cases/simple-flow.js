@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-import { describe, it, before, beforeEach } from 'mocha'
+import { describe, it, before, beforeEach, after } from 'mocha'
 import supertest from 'supertest'
 import chai, { expect } from 'chai'
 import dirtyChai from 'dirty-chai'
@@ -52,7 +52,6 @@ describe('ex-modular tests', function () {
       .then((a) => {
         app = a
         context.request = supertest(app)
-        console.log('app initialized')
         done()
       })
       .catch((err) => {
