@@ -46,7 +46,7 @@
     "express": "^4.17.1",
     "express-list-endpoints": "^4.0.1",
     "express-validator": "^6.3.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "knex": "^0.20.7",
     "lodash": "^4.17.15",
     "marked": "^0.8.0",
